@@ -1,0 +1,34 @@
+<ion-menu [content]="content">
+
+  <ion-toolbar>
+    <ion-title>myInvestor</ion-title>
+  </ion-toolbar>
+
+  <ion-content>
+    
+    <ion-list>
+      <ion-list-header>
+        Investment
+      </ion-list-header>
+      <button ion-item menuClose *ngFor="let p of appPages" (click)="openPage(p)">
+        <ion-icon item-left [name]="p.icon"></ion-icon>
+        {{p.title}}
+      </button>
+    </ion-list>
+
+      <ion-list>
+      <ion-list-header>
+        System
+      </ion-list-header>
+      <button ion-item menuClose *ngFor="let p of otherPages" (click)="openPage(p)">
+        <ion-icon item-left [name]="p.icon"></ion-icon>
+        {{p.title}}
+      </button>
+    </ion-list>
+
+  </ion-content>
+
+</ion-menu>
+
+<!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
+<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>

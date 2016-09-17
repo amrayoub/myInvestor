@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-navbar>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Stock Analysis</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding class="outer-content stock-analysis">
+
+  <h4>Stock Analysis</h4>
+
+  <ion-list no-lines>
+
+    <ion-item>
+      <ion-icon name="stats" item-left></ion-icon>
+      <ion-label>Market</ion-label>
+      <ion-select [(ngModel)]="targetMarket">
+        <ion-option *ngFor="let market of markets" [value]="market.symbol" [checked]="false">{{market.name}}</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <button large (click)="performAnalysis($event)">Start Analysis</button>
+    </ion-item>
+
+  </ion-list>
+
+
+  <ion-card [hidden]="hideProcessingPanel">
+
+    <ion-item>
+      <ion-avatar item-left>
+        <span class='badge'>1/900 </span>
+      
+        </ion-avatar>
+        <h2><ion-badge secondary>IDMENSN</ion-badge> - iDimension Consolidated Bhd</h2>
+        <p>FTSE Bursa Malaysia</p>
+      
+     
+    </ion-item>
+
+     <progress max="{{stockAnalysis.totalStocks}}" value="{{stockAnalysis.currentStockIndex}}"><span>50</span>%</progress>
+
+    <ion-card-content>
+      <p>Processing historical data from Sept 1, 2015 to Oct 1, 2016.</p>
+    </ion-card-content>
+
+  </ion-card>
+
+</ion-content>
