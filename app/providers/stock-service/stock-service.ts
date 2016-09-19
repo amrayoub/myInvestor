@@ -13,17 +13,14 @@ const CREATE_STOCK_TABLE = 'CREATE TABLE IF NOT EXISTS stock (id INTEGER PRIMARY
 
 // Global stocks
 export class StockConfig {
-  
   // FTSE Bursa Malaysia
   static KLSE_EXCHANGE_SYMBOL: string = 'KLSE';
   static KLSE_EXCHANGE_NAME:string  = 'FTSE Bursa Malaysia';
 
-  
-
 }
 
 /*
-  Stock service.
+  Database access layer for the stock database.
 */
 @Injectable()
 export class StockService {
@@ -31,6 +28,7 @@ export class StockService {
   // SqlStorage instance
   storage: Storage = null;
 
+  // Constructor
   constructor(public http: Http) {
     this.storage = new Storage(SqlStorage, { name: DATABASE_NAME });
 
@@ -39,14 +37,17 @@ export class StockService {
 
   }
 
+  // Retrieve all support markets
   public getMarkets() {
     return this.storage.query('SELECT * FROM market');
   }
 
+  // Get market by symbol
   public getMarket(symbol: string) {
     return this.storage.query('SELECT * FROM market WHERE symbol = ?', [symbol]);
   }
 
+  // Insert market data
   createMarketTable() {
     this.storage.query(CREATE_STOCK_MARKET_TABLE).then(() => {
       // KLSE exchange
@@ -57,6 +58,7 @@ export class StockService {
     });
   }
 
+  // Insert data for a particular market
   insertMarket(market: StockMarket) {
     // Check if the table is empty
     this.storage.query('SELECT COUNT(*) AS recordCount FROM market where symbol = ?', [market.symbol]).then((data) => {
@@ -75,9 +77,9 @@ export class StockService {
     });
   }
 
+  // Insert stocks for a particular market
   insertStocks(marketId: number, marketSymbol: string) {
-    // Insert stock for the particular 
-    // console.log('symbol ----' + marketSymbol);
+    // Insert stocks for the particular market
     this.http.get('data/' + marketSymbol + '.json').subscribe(res => {
       let stocks = res.json();
       // Create the stock table
@@ -90,9 +92,13 @@ export class StockService {
     });
   }
 
+  // Insert a stock
   insertStock(marketId: number, stock: Stock){
-    // console.log('market id --- ' + marketId + ' --- name ----' + stock.name + ' -----  symbol -----' + stock.symbol);
     this.storage.query('INSERT INTO stock(symbol, name, market_id) VALUES(?, ?, ?)', [stock.symbol, stock.name, marketId]);
+  }
+
+  getStocks(marketId: number) {
+    return this.storage.query('SELECT * FROM stock WHERE market_id = ?', [marketId]);
   }
 }
 

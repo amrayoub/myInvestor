@@ -17,8 +17,8 @@
     <ion-item>
       <ion-icon name="stats" item-left></ion-icon>
       <ion-label>Market</ion-label>
-      <ion-select [(ngModel)]="targetMarket">
-        <ion-option *ngFor="let market of markets" [value]="market.symbol" [checked]="false">{{market.name}}</ion-option>
+      <ion-select [(ngModel)]="marketId">
+        <ion-option *ngFor="let market of markets" [value]="market.id" [checked]="false">{{market.name}}</ion-option>
       </ion-select>
     </ion-item>
 
@@ -29,47 +29,23 @@
   </ion-list>
 
 
-  <ion-card>
+  <ion-card [hidden]="hideProcessingPanel">
 
     <ion-item>
       <ion-avatar item-left>
-        <span class='badge'>1/900 </span>
+        <span class='badge'>{{stockAnalysis.currentStockIndex}}/{{stockAnalysis.totalStocks}} </span>
       
         </ion-avatar>
-        <h2><ion-badge secondary>IDMENSN</ion-badge> - iDimension Consolidated Bhd</h2>
-        <p>FTSE Bursa Malaysia</p>
+        <h2><ion-badge secondary>{{stockAnalysis.currentStock.symbol}}</ion-badge> - {{stockAnalysis.currentStock.name}}</h2>
+        <p>{{stockAnalysis.currentMarket.name}}</p>
       
      
     </ion-item>
-
-     <progress max="{{stockAnalysis.totalStocks}}" value="{{stockAnalysis.currentStockIndex}}"><span>50</span>%</progress>
-
     <ion-card-content>
+      <progress max="3" value="1"></progress>
+      <p class='badge'>Preparing data</p>
       <p>Processing historical data from Sept 1, 2015 to Oct 1, 2016.</p>
     </ion-card-content>
-
-    <!--
-    <ion-row>
-      <ion-col>
-        <button dark clear small>
-        <ion-icon name='checkmark'></ion-icon>
-        <div>Data</div>
-      </button>
-      </ion-col>
-      <ion-col>
-        <button primary clear small>
-        <ion-icon name='checkmark-circle'></ion-icon>
-        <div>Analysis</div>
-      </button>
-      </ion-col>
-      <ion-col>
-        <button primary clear small>
-        <ion-icon name='close-circle'></ion-icon>
-        <div>Suggest</div>
-      </button>
-      </ion-col>
-    </ion-row>
-    -->
 
   </ion-card>
 

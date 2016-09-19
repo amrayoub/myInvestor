@@ -1,0 +1,36 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "com.ionicframework.myinvestor745636"
+        },
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "com.ionicframework.myinvestor745636"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "com.ionicframework.myinvestor745636"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.ionicframework.myinvestor745636"
+        },
+        "ionic-plugin-keyboard": {
+            "PACKAGE_NAME": "com.ionicframework.myinvestor745636"
+        },
+        "cordova-sqlite-storage": {
+            "PACKAGE_NAME": "com.ionicframework.myinvestor745636"
+        },
+        "cordova-plugin-sqlite-2": {
+            "PACKAGE_NAME": "com.ionicframework.myinvestor745636"
+        },
+        "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "com.myinvestor"
+        }
+    },
+    "dependent_plugins": {}
+}

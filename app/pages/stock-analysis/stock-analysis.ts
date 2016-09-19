@@ -3,33 +3,35 @@ import { NavController, NavParams, ViewController, ToastController } from 'ionic
 
 import { StockMarket, Stock } from '../../providers/stock-service/stock-model';
 import { StockService, StockConfig } from '../../providers/stock-service/stock-service';
+import { StockEngine } from '../../providers/stock-engine/stock-engine';
 
-
+// Stock analysis
 export class StockAnalysis {
-  currentStockIndex: number = 10;  // Current stock being analyzed
-  currentStockSymbol: string;
-  currentStockName: string;
-  marketName: string;
-  totalStocks: number = 100;     //  Total stocks to be analyzed
+  totalStocks: number = 0;        //  Total stocks to be analyzed
+  currentStockIndex: number = 0;  // Current stock being analyzed
+  currentMarket: StockMarket;  
+  currentStock: Stock;
+  stocks: Stock[];
 
   constructor() {
-
+    this.stocks = [];
+    this.currentMarket = new StockMarket(0, '', '');
+    this.currentStock = new Stock(0, '', '', 0);
   }
 }
 
-/*
-  Stock analysis page.
-*/
+// Stock analysis page
 @Component({
   templateUrl: 'build/pages/stock-analysis/stock-analysis.html',
 })
 export class StockAnalysisPage {
 
   markets: StockMarket[]; // List of support markets
-  targetMarket: string;   // Market to be analyzed
+  marketId: number;       // Market to be analyzed
+
   stockAnalysis: StockAnalysis; // Stock analysis
   hideProcessingPanel: boolean = true;
-
+ 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -37,7 +39,7 @@ export class StockAnalysisPage {
     public toastCtrl: ToastController,
     public stockService: StockService
   ) {
-    this.targetMarket = StockConfig.KLSE_EXCHANGE_SYMBOL; // Default to KLSE  
+    this.marketId = 1;    // Default market id
     this.stockAnalysis = new StockAnalysis();
     this.loadMarkets();   // Load market information
   }
@@ -55,16 +57,30 @@ export class StockAnalysisPage {
   }
 
 
+  // Perform stock analysis
   performAnalysis(event) {
-    // console.log(this.targetMarket);
-    
-    // Show the processing panel
-    this.hideProcessingPanel = false;
+    // console.log('Performing analysis for ' + this.marketId);      
+    // Retrieve all stocks related to this exchange
+    this.stockService.getStocks(this.marketId).then(data => {     
+      if (data.res.rows.length > 0) {
+        this.hideProcessingPanel = false;    // Show the processing panel
+        this.stockAnalysis.currentMarket = this.markets.find(market => market.id === this.marketId);        
+        this.stockAnalysis.totalStocks = data.res.rows.length;
+        for (var i = 0; i < data.res.rows.length; i++) {
+          let stock = data.res.rows.item(i);
+          this.stockAnalysis.currentStockIndex = i + 1;
+          this.stockAnalysis.currentStock = new Stock(stock.id, stock.symbol, stock.name, stock.market_id);
+          this.stockAnalysis.stocks.push(this.stockAnalysis.currentStock);  
 
-    //this.stockService.getStocks().then(data => {
+          // Process each stock
+        }
+      } else {
+        // No stocks found, display an error message
 
-    //});
-
+      }
+    });    
   }
+
+  
 
 }

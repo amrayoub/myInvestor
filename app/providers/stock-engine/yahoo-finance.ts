@@ -1,6 +1,8 @@
+import { Injectable } from '@angular/core';
+
 import { StockEngine } from './stock-engine';
 
-@Injectable
+@Injectable()
 export class YahooFinance extends StockEngine {
   
 }
