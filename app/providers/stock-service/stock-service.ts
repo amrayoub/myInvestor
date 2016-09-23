@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Storage, SqlStorage} from 'ionic-angular';
+import { Storage, SqlStorage } from 'ionic-angular';
 import { Http } from '@angular/http';
 
 import { StockMarket, Stock } from '../../providers/stock-service/stock-model';
@@ -15,7 +15,7 @@ const CREATE_STOCK_TABLE = 'CREATE TABLE IF NOT EXISTS stock (id INTEGER PRIMARY
 export class StockConfig {
   // FTSE Bursa Malaysia
   static KLSE_EXCHANGE_SYMBOL: string = 'KLSE';
-  static KLSE_EXCHANGE_NAME:string  = 'FTSE Bursa Malaysia';
+  static KLSE_EXCHANGE_NAME: string = 'FTSE Bursa Malaysia';
 
 }
 
@@ -30,11 +30,7 @@ export class StockService {
 
   // Constructor
   constructor(public http: Http) {
-    this.storage = new Storage(SqlStorage, { name: DATABASE_NAME });
-
-    // For 1st time setup, create the necessary tables and populate the data
-    this.createMarketTable();
-
+    this.storage = new Storage(SqlStorage, { name: DATABASE_NAME });   
   }
 
   // Retrieve all support markets
@@ -61,17 +57,31 @@ export class StockService {
   // Insert data for a particular market
   insertMarket(market: StockMarket) {
     // Check if the table is empty
-    this.storage.query('SELECT COUNT(*) AS recordCount FROM market where symbol = ?', [market.symbol]).then((data) => {
-      let count = data.res.rows.item(0).recordCount;
+    this.storage.query('SELECT COUNT(*) AS recordCount FROM market where symbol = ?', [market.symbol]).then((response) => {
+      let count = response.res.rows.item(0).recordCount;
       if (count === 0) {
-        this.storage.query('INSERT INTO market (symbol, name) VALUES (?, ?)', [market.symbol, market.name]).then((data) => {
-          this.getMarket(market.symbol).then(data => {
-            if (data.res.rows.length > 0) {
-              let market = data.res.rows.item(0);
+        this.storage.query('INSERT INTO market (symbol, name) VALUES (?, ?)', [market.symbol, market.name]).then((response) => {
+          this.getMarket(market.symbol).then(response => {
+            if (response.res.rows.length > 0) {
+              let market = response.res.rows.item(0);
               // Insert stocks related to this exchange
               this.insertStocks(market.id, market.symbol);
             }
           });
+        });
+      } else {
+        // Check if there is any stocks associated with the market
+        this.getMarket(market.symbol).then(response => {
+          if (response.res.rows.length > 0) {
+            let market = response.res.rows.item(0);
+            this.storage.query('SELECT COUNT(*) AS recordCount FROM stock where market_id = ?', [market.id]).then((response) => {
+              let count = response.res.rows.item(0).recordCount;
+              if (count === 0) {
+                // Insert stocks related to this exchange
+                this.insertStocks(market.id, market.symbol);
+              }
+            });
+          }
         });
       }
     });
@@ -80,21 +90,22 @@ export class StockService {
   // Insert stocks for a particular market
   insertStocks(marketId: number, marketSymbol: string) {
     // Insert stocks for the particular market
-    this.http.get('data/' + marketSymbol + '.json').subscribe(res => {
-      let stocks = res.json();
+    this.http.get('data/' + marketSymbol + '.json').subscribe(response => {
+      let stocks = response.json();
       // Create the stock table
-      this.storage.query(CREATE_STOCK_TABLE).then(() => {
+      this.storage.query(CREATE_STOCK_TABLE).then((response) => {
         stocks.forEach(jsonObj => {
           let stock = new Stock(0, jsonObj.symbol, jsonObj.name, marketId);
-          this.insertStock(marketId, stock);
+          this.insertStock(response, marketId, stock);
         });
-      });      
+      });
     });
   }
 
   // Insert a stock
-  insertStock(marketId: number, stock: Stock){
-    this.storage.query('INSERT INTO stock(symbol, name, market_id) VALUES(?, ?, ?)', [stock.symbol, stock.name, marketId]);
+  insertStock(response: any, marketId: number, stock: Stock) {
+    console.log('inserting --- ' + stock.name);
+    response.tx.executeSql('INSERT INTO stock(symbol, name, market_id) VALUES(?, ?, ?)', [stock.symbol, stock.name, marketId]);
   }
 
   getStocks(marketId: number) {

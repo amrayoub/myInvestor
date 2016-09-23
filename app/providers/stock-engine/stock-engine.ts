@@ -8,8 +8,5 @@ export class StockEngine {
 
    }
 
-   getHistoryData(){
-     
-   }
 
 }

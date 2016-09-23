@@ -10,6 +10,10 @@ import { AboutPage } from './pages/about/about';
 import { SettingsPage } from './pages/settings/settings';
 
 import { StockService } from './providers/stock-service/stock-service';
+import { AlertService } from './providers/helper-service/alert-service';
+import { AppConfig } from './providers/app-config';
+import { AppInitializer } from './providers/app-initializer';
+
 
 interface PageObj {
   title: string;
@@ -29,20 +33,23 @@ class MyInvestorApp {
   appPages: PageObj[];
   otherPages: PageObj[];
 
-  constructor(  
-      public events: Events,
-      public menu: MenuController, 
-      public platform: Platform,
-      public stockService: StockService
-      ) {
-    
+  constructor(
+    public events: Events,
+    public menu: MenuController,
+    public platform: Platform,
+    public appConfig: AppConfig,
+    public appInitializer: AppInitializer,
+    public stockService: StockService,
+    public aletService: AlertService
+  ) {
+
     this.initializeApp();
 
     // App pages
     this.appPages = [
       { title: 'Watchlist', component: WatchlistPage, index: 1, icon: 'eye' },
       { title: 'Portfolio', component: PortfolioPage, index: 2, icon: 'briefcase' },
-      { title: 'Stock Analysis', component: StockAnalysisPage, index: 3, icon: 'analytics' }    
+      { title: 'Stock Analysis', component: StockAnalysisPage, index: 3, icon: 'analytics' }
     ];
 
     // Other pages
@@ -52,8 +59,7 @@ class MyInvestorApp {
     ];
 
     // Load any required data
-    
-
+    appInitializer.load();
   }
 
   initializeApp() {
@@ -68,12 +74,12 @@ class MyInvestorApp {
     // Reset the content nav to have just this page
     // we wouldn't want the back button to show in this scenario
     if (page.index) {
-      this.nav.setRoot(page.component, {tabIndex: page.index});
+      this.nav.setRoot(page.component, { tabIndex: page.index });
     } else {
       this.nav.setRoot(page.component);
     }
   }
 }
 
-ionicBootstrap(MyInvestorApp, [StockService], { });
+ionicBootstrap(MyInvestorApp, [StockService, AlertService, AppConfig, AppInitializer], {});
 
