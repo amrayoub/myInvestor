@@ -25,6 +25,10 @@ interface PageObj {
 @Component({
   templateUrl: 'build/app.html'
 })
+
+/**
+ * myInvestor application initializer.
+ */
 class MyInvestorApp {
   @ViewChild(Nav) nav: Nav;
 
@@ -81,5 +85,5 @@ class MyInvestorApp {
   }
 }
 
-ionicBootstrap(MyInvestorApp, [StockService, AlertService, AppConfig, AppInitializer], {});
+ionicBootstrap(MyInvestorApp, [ AppConfig, AppInitializer, AlertService, StockService ], {});
 

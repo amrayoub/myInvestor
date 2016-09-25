@@ -75,7 +75,7 @@ var MyInvestorApp = (function () {
     ], MyInvestorApp);
     return MyInvestorApp;
 }());
-ionic_angular_1.ionicBootstrap(MyInvestorApp, [stock_service_1.StockService, alert_service_1.AlertService, app_config_1.AppConfig, app_initializer_1.AppInitializer], {});
+ionic_angular_1.ionicBootstrap(MyInvestorApp, [app_config_1.AppConfig, app_initializer_1.AppInitializer, alert_service_1.AlertService, stock_service_1.StockService], {});
 },{"./pages/about/about":2,"./pages/portfolio/portfolio":3,"./pages/settings/settings":4,"./pages/stock-analysis/stock-analysis":5,"./pages/watch-list/watch-list":6,"./providers/app-config":7,"./providers/app-initializer":8,"./providers/helper-service/alert-service":9,"./providers/stock-service/stock-service":11,"@angular/core":159,"ionic-angular":473,"ionic-native":500}],2:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {

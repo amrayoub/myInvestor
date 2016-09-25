@@ -5,7 +5,6 @@ import { StockService } from './stock-service/stock-service';
 @Injectable()
 export class AppInitializer {
 
-
     constructor(public stockService: StockService) {
 
     }
