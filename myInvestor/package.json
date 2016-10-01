@@ -1,7 +1,7 @@
 {
-  "name": "ionic-hello-world",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
+  "name": "myInvestor",
+  "author": "Koh Meng Wang",
+  "homepage": "https://github.com/mengwangk",
   "private": true,
   "scripts": {
     "build": "ionic-app-scripts build",
@@ -22,7 +22,7 @@
     "@ionic/app-scripts": "^0.0.23",
     "typescript": "^2.0.3"
   },
-  "description": "myInvestor: An Ionic project",
+  "description": "myInvestor: An open source Android project",
   "cordovaPlugins": [
     "cordova-plugin-device",
     "cordova-plugin-console",
