@@ -70,12 +70,11 @@ if (casper.cli.args.length === 0) {
                     casper.echo(historicalDataUrl);
                     this.download(historicalDataUrl, exchangeName + fs.separator + stock.symbol + '.csv');
                 }
+                timestamp = Date.now() - timestamp;
+                console.log('Total time: ' + (timestamp / 1000) + ' seconds');
+                casper.exit();
             });
-
             casper.run();
-
-
-
         } else {
             casper.exit(1);
         }

@@ -57,7 +57,7 @@ if (system.args.length === 1) {
                 var stocks = [];
                 try {
                     var counter = 1;
-                    for (counter = 1; counter <= 2000; counter++) {
+                    for (counter = 1; counter <= 10000; counter++) {
                         // company
                         var cells = document.querySelectorAll("a#rc-" + counter);
                         var company = Array.prototype.map.call(cells, function (cell) {
