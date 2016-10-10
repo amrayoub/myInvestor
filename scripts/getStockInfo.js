@@ -19,12 +19,11 @@ String.prototype.format = String.prototype.f = function () {
     return s;
 };
 
-var GOOGLE_FINANCE_URL_GET_STOCK_HISTORY = 'http://www.google.com/finance/historical?q={0}%3A{1}&ei=zsb0V4H5K5LQuATWx7_oDQ&output=csv';
+var GOOGLE_FINANCE_URL_GET_STOCK_INFO = 'https://www.google.com/finance?q={0}:{1}&sq=%5B(exchange+%3D%3D+%22{2}%22)%5D&sp=1&ei=YAr5V6qTEYPTuATt-ZfYAw';
 
 var system = require('system'),
-    page = require('webpage').create(),
-    timestamp,
-    stockDetailsUrl;
+    webPage = require('webpage'),
+    timestamp;
 
 var fs = require('fs');
 
@@ -56,10 +55,13 @@ if (system.args.length === 1) {
         }
 
         if (Array.isArray(stocks)) {
-            for (var counter = 0; counter < stocks.length; counter++) {
-                var stock = stocks[counter];
-                console.log('Retrieving stock info for [' + stock.company + ']');
-            }
+            var counter = 0;
+            //for (var counter = 0; counter < 3; counter++) {
+            //var counter = 3;
+            //    var stock = stocks[counter];
+            getStockInfo(stocks, counter);
+
+            // }
         } else {
             phantom.exit(1);
         }
@@ -68,10 +70,36 @@ if (system.args.length === 1) {
         console.log(e.message);
         phantom.exit(1);
     }
-    timestamp = Date.now() - timestamp;
-    console.log('Total time: ' + (timestamp / 1000) + ' seconds');
-    phantom.exit();
-
+    //
 }
+
+function getStockInfo(stocks, counter) {
+    var stock = stocks[counter];
+    console.log('Retrieving stock info for [' + stock.company + ']');
+    var stockInfoUrl = GOOGLE_FINANCE_URL_GET_STOCK_INFO.format(exchangeName, encodeURIComponent(stock.symbol), exchangeName);
+    console.log(stockInfoUrl);
+    var page = webPage.create();
+    page.open(stockInfoUrl, function (status) {
+        if (status !== 'success') {
+            console.log('Unable to access network');
+        } else {
+            console.log("okay");
+            var title = page.evaluate(function () {
+                return document.title;
+            });
+            console.log(title);
+        }
+        page.close();
+        //if (counter === (stocks.length - 1)) {
+        if (counter == 2) {
+            timestamp = Date.now() - timestamp;
+            console.log('Total time: ' + (timestamp / 1000) + ' seconds');
+            phantom.exit();
+        } else {
+            getStockInfo(stocks, ++counter);
+        }
+    });
+}
+
 
 

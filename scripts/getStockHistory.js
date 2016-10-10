@@ -65,7 +65,7 @@ if (casper.cli.args.length === 0) {
                     var stock = stocks[counter];
                     // Get historical price for each stock
                     historicalDataUrl = GOOGLE_FINANCE_URL_GET_STOCK_HISTORY;
-                    historicalDataUrl = historicalDataUrl.format(exchangeName, stock.symbol);
+                    historicalDataUrl = historicalDataUrl.format(exchangeName, encodeURIComponent(stock.symbol));
                     console.log('Retrieving historical data for [' + stock.company + ']');
                     casper.echo(historicalDataUrl);
                     this.download(historicalDataUrl, exchangeName + fs.separator + stock.symbol + '.csv');
