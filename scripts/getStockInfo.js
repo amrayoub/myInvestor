@@ -9,6 +9,8 @@
 
 "use strict";
 
+
+
 String.prototype.format = String.prototype.f = function () {
     var s = this,
         i = arguments.length;
@@ -56,12 +58,7 @@ if (system.args.length === 1) {
 
         if (Array.isArray(stocks)) {
             var counter = 0;
-            //for (var counter = 0; counter < 3; counter++) {
-            //var counter = 3;
-            //    var stock = stocks[counter];
             getStockInfo(stocks, counter);
-
-            // }
         } else {
             phantom.exit(1);
         }
@@ -77,21 +74,87 @@ function getStockInfo(stocks, counter) {
     var stock = stocks[counter];
     console.log('Retrieving stock info for [' + stock.company + ']');
     var stockInfoUrl = GOOGLE_FINANCE_URL_GET_STOCK_INFO.format(exchangeName, encodeURIComponent(stock.symbol), exchangeName);
-    console.log(stockInfoUrl);
     var page = webPage.create();
     page.open(stockInfoUrl, function (status) {
         if (status !== 'success') {
             console.log('Unable to access network');
         } else {
-            console.log("okay");
-            var title = page.evaluate(function () {
-                return document.title;
+            var stockInfo = page.evaluate(function () {
+
+                function getValue(document, selector) {
+                    var cells = document.querySelectorAll(selector);
+                    var value = Array.prototype.map.call(cells, function (cell) {
+                        return cell.innerText;
+                    });
+                    var re = new RegExp(String.fromCharCode(160), "g");
+                    return value.toString().replace(/["'()]/g, "").replace(re, "").replace('-', "");
+                }
+
+                var stockInfo = [];
+
+                // Current price
+                var current = getValue(document, '#price-panel > div:nth-child(1) > span');
+
+                // Price change
+                var change = getValue(document, '#price-panel > div:nth-child(1) > div > span > span:nth-child(1)');
+
+                // Change percentage
+                var changePercentage = getValue(document, '#price-panel > div:nth-child(1) > div > span > span:nth-child(2)');
+
+                // Timestamp
+                var time = getValue(document, '#price-panel > div:nth-child(2) > span > span');
+
+                // Range
+                var range = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(1) > tbody > tr:nth-child(1) > td.val');
+
+                // Div/Yield
+                var dividendYield = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(2) > tbody > tr:nth-child(1) > td.val');
+
+                // 52 weeks
+                var _52Weeks = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(1) > tbody > tr:nth-child(2) > td.val');
+
+                // EPS
+                var eps = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(2) > tbody > tr:nth-child(2) > td.val');
+
+                // Open
+                var open = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(1) > tbody > tr:nth-child(3) > td.val');
+
+                // Shares
+                var shares = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(2) > tbody > tr:nth-child(3) > td.val');
+
+                // Volume
+                var volume = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(1) > tbody > tr:nth-child(4) > td.val');
+
+                // Beta
+                var beta = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(2) > tbody > tr:nth-child(4) > td.val');
+
+                // Market capital
+                var marketCapital = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(1) > tbody > tr:nth-child(5) > td.val');
+
+                // PE
+                var pe = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(1) > tbody > tr:nth-child(6) > td.val');
+
+                // Inst. own
+                var instOwn = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(2) > tbody > tr:nth-child(5) > td.val');
+
+                stockInfo.push({
+                    current: current, change: change, changePercentage: changePercentage,
+                    time: time, range: range, dividendYield: dividendYield, _52Weeks: _52Weeks,
+                    eps: eps, open: open, shares: shares, volume: volume, beta: beta,
+                    marketCapital: marketCapital, pe: pe, instOwn: instOwn
+                });
+                return stockInfo;
             });
-            console.log(title);
+
+            // Write to output file
+            var fileName = exchangeName + fs.separator + stock.symbol + '.json';
+            console.log('Writing to ' + fileName);
+            fs.write(fileName, JSON.stringify(stockInfo), 'w');
         }
         page.close();
-        //if (counter === (stocks.length - 1)) {
-        if (counter == 2) {
+
+        if (counter === (stocks.length - 1)) {
+        //if (counter == 5) {
             timestamp = Date.now() - timestamp;
             console.log('Total time: ' + (timestamp / 1000) + ' seconds');
             phantom.exit();
