@@ -37,7 +37,7 @@ function csvToArray(csvString) {
         // Then iterate through the remaining properties and use the headers as keys
         for (var propIndex = 0; propIndex < rowArray.length; ++propIndex) {
             // Grab the value from the row array we're looping through...
-            var propValue = rowArray[propIndex].replace(/^"|"$/g, '');
+            var propValue = rowArray[propIndex].replace(/^"|"$/g, '').replace('-', '');
             // ...also grab the relevant header (the RegExp in both of these removes quotes)
             var propLabel = csvHeaders[propIndex].replace(/^"|"$/g, '');;
 
@@ -67,33 +67,23 @@ if (system.args.length === 1) {
     try {
         var content = fs.read(stockSymbolFileName);
         var stocks = JSON.parse(content);
-
-        // Create a folder named after the exchange name
-        if (!fs.exists(exchangeName) || (fs.exists(exchangeName) && !fs.isDirectory(exchangeName))) {
-            if (fs.makeDirectory(exchangeName)) {
-                console.log('Created the folder [' + exchangeName + ']');
-            } else {
-                console.log('Unable to create folder [' + exchangeName + ']');
-            }
-        } else {
-            console.log('Folder [' + exchangeName + '] already exists');
-        }
-
         if (Array.isArray(stocks)) {
             var counter = 0;
-            for (counter = 0; counter < stocks.length; counter++){
+            for (counter = 0; counter < stocks.length; counter++) {
                 var stock = stocks[counter];
                 console.log('Processing [' + stock.symbol + ']');
                 var fileName = exchangeName + fs.separator + stock.symbol + ".csv";
                 if (fs.exists(fileName)) {
                     var content = fs.read(fileName);
                     var histories = csvToArray(content);
-                    //console.log(JSON.stringify(histories));
-                    console.log(histories[0].Date);
+                    if (histories.length > 0) {
+                        console.log(histories[0].Date);
+                        console.log(histories[0].High);
+                    }
                 } else {
                     console.log(fileName + ' does not exist');
                 }
-            }            
+            }
             phantom.exit();
         } else {
             phantom.exit(1);
