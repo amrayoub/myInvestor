@@ -1,0 +1,2 @@
+# myInvestor
+Cassandra scripts
