@@ -9,8 +9,6 @@
 
 "use strict";
 
-
-
 String.prototype.format = String.prototype.f = function () {
     var s = this,
         i = arguments.length;
