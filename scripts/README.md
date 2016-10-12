@@ -1,1 +1,1 @@
-PhantomJS and CasperJS scripts to scrap data from Google Finance.
+PhantomJS and CasperJS scripts to scrape data from Google Finance.
