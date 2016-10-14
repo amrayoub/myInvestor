@@ -1,5 +1,5 @@
 /**
- * Node.js script to insert stocks into Cassandra database.
+ * Node.js script to insert stock history into Cassandra database.
  * 
  */
 
@@ -15,22 +15,16 @@ const path = require('path');
 const async = require('async');
 
 if (process.argv.length !== 3) {
-    console.error("Please pass in the stock exchange symbol file");
+    console.error("Please pass in the exchange name");
     process.exit(1);
 }
-const filePath = process.argv[2];
+const exchangeName = process.argv[2];
 try {
-    var stats = fs.statSync(filePath);
-    if (!stats.isFile()) {
-        console.error('file not exist');
-        process.exit(1);
-    }
-    // Read the JSON file
-    var stocks = JSON.parse(fs.readFileSync(filePath));
-    var exchangeName = path.basename(filePath).split('.')[0];
-    var exchangeId = '';
 
     const client = new cassandra.Client({ contactPoints: [CASSANDRA_HOST], keyspace: CASSANDRA_KEYSPACE });
+    // Get the exchange id
+    var exchangeId = '';
+
     async.series([
         function connect(next) {
             console.log('Connecting to Cassandra');
@@ -47,22 +41,20 @@ try {
             });
         },
         function insert(next) {
-            var counter = 0;
-            for (var i = 0; i < stocks.length; i++) {
-                var stock = stocks[i];
-                var insert = 'INSERT INTO stock (stock_symbol, stock_name, exchange_id) VALUES (?, ?, ?)';
-                // console.log(stock.symbol);
-                client.execute(insert, [stock.symbol, stock.company, exchangeId], { prepare: true }, function (err, result) {
-                    if (err) {
-                        // Do nothing
-                    }
-                    if (++counter == stocks.length) {
-                        next();
-                    }
-                });
-            }
-            console.log('Total stocks inserted: ' + stocks.length);
-        },
+            if (exchangeId === '') next();
+            const query = 'SELECT stock_symbol, stock_name FROM stock WHERE exchange_id = ?';
+            client.eachRow(query, [exchangeId], { prepare: true },
+                function (n, row) {
+                    // Retrieve the stock history
+                    
+                },
+                function (err) {
+                    if (err) return next(err);
+                    next();
+                }
+            );
+
+        }
     ], function (err) {
         if (err) {
             console.error('There was an error', err.message, err.stack);
@@ -70,6 +62,7 @@ try {
         console.log('Shutting down');
         client.shutdown();
     });
+
 
 } catch (e) {
     console.error(e.message);
