@@ -26,7 +26,7 @@ try {
         process.exit(1);
     }
     // Read the JSON file
-    var stocks = JSON.parse(fs.readFileSync(filePath));
+    var stocks = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     var exchangeName = path.basename(filePath).split('.')[0];
     var exchangeId = '';
 
