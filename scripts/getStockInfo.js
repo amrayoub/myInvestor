@@ -85,7 +85,7 @@ function getStockInfo(stocks, counter) {
                         return cell.innerText;
                     });
                     var re = new RegExp(String.fromCharCode(160), "g");
-                    return value.toString().replace(/["'()]/g, "").replace(re, "").replace('-', "");
+                    return value.toString().replace(/["'()]/g, "").replace(re, "");
                 }
 
                 var stockInfo = [];

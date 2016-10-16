@@ -1,8 +1,8 @@
 /**
- * Node.js script to insert stock history into Cassandra database.
+ * Insert stock info into Cassandra.
+ * 
  * 
  */
-
 "use strict";
 
 const CASSANDRA_HOST = 'localhost';
@@ -53,6 +53,9 @@ try {
             );
         },
         function insert(next) {
+            console.log(JSON.stringify(stocks));
+            next();
+            /*
             var stockCount = 0;
             for (var counter = 0; counter < stocks.length; counter++) {
                 var stock = stocks[counter];
@@ -88,6 +91,8 @@ try {
                     if (++stockCount === stocks.length) next();
                 }
             }
+            */
+            
         }
     ], function (err) {
         if (err) {
@@ -123,20 +128,4 @@ function parseDate(s) {
     if (p.length >= 3)
         return (parseInt(p[2]) + 2000) + "-" + zeroFill(months[p[1].toLowerCase()], 2) + "-" + zeroFill(p[0], 2);
     return '';
-}
-
-function csvToArray(csvString) {
-    var csvArray = [];
-    var csvRows = csvString.split(/\n/);
-    var csvHeaders = csvRows.shift().split(',');
-    for (var rowIndex = 0; rowIndex < csvRows.length; ++rowIndex) {
-        var rowArray = csvRows[rowIndex].split(',');
-        var rowObject = csvArray[rowIndex] = {};
-        for (var propIndex = 0; propIndex < rowArray.length; ++propIndex) {
-            var propValue = rowArray[propIndex].replace(/^"|"$/g, '');
-            var propLabel = csvHeaders[propIndex].replace(/^"|"$/g, '');
-            rowObject[propLabel] = propValue;
-        }
-    }
-    return csvArray;
 }

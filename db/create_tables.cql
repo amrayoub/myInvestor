@@ -1,6 +1,6 @@
 
 CREATE KEYSPACE myInvestor
-WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 
 CREATE TABLE exchange
 (
@@ -33,6 +33,11 @@ history_low DECIMAL,
 history_close DECIMAL,
 history_volume INT,
 PRIMARY KEY(stock_symbol, history_date)
+);
+
+CREATE TABLE stock_details
+(
+
 );
 
 
