@@ -53,46 +53,58 @@ try {
             );
         },
         function insert(next) {
-            console.log(JSON.stringify(stocks));
-            next();
-            /*
             var stockCount = 0;
             for (var counter = 0; counter < stocks.length; counter++) {
                 var stock = stocks[counter];
-                console.log('Updating history for ' + stock.stock_symbol);
-                var filePath = exchangeName + path.sep + stock.stock_symbol + ".csv";
-                var stats = fs.statSync(filePath);
-                if (stats.isFile()) {
-                    // Read the file
-                    var content = fs.readFileSync(filePath, "utf-8");
-                    var histories = csvToArray(content);
-                    var batchQueries = [];
-                    if (histories.length > 5) { // Condition if history is available
-                        var recordCount = 0;
-                        for (var i = 0; i < histories.length; i++) {
-                            var dt = parseDate(histories[i].Date);
-                            if (dt === '') continue;
+                console.log('Updating stock info for ' + stock.stock_symbol);
+                var filePath = exchangeName + path.sep + stock.stock_symbol + ".json";
+                try {
+                    var stats = fs.statSync(filePath);
+                    if (stats.isFile()) {
+                        var details = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+                        var insert = 'INSERT INTO stock_details (stock_symbol, details_52weeks_from, details_52weeks_to,' +
+                            'details_beta,' +
+                            'details_change,' +
+                            'details_change_percentage,' +
+                            'details_current_price,' +
+                            'details_dividend_yield,' +
+                            'details_eps,' +
+                            'details_inst_own,' +
+                            'details_market_capital,' +
+                            'details_open,' +
+                            'details_pe,' +
+                            'details_range_from,' +
+                            'details_range_to,' +
+                            'details_shares,' +
+                            'details_time,' +
+                            'details_volume,' +
+                            'details_extracted_timestamp' +
+                            ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-                            // Create a batch query
-                            var insert = 'INSERT INTO stock_history (stock_symbol, history_date, history_open, history_high, history_low, history_close, history_volume) VALUES (?, ?, ?, ?, ?, ?, ?) IF NOT EXISTS';
-                            batchQueries.push({ query: insert, params: [stock.stock_symbol, dt, getNumberValue(histories[i].Open), getNumberValue(histories[i].High), getNumberValue(histories[i].Low), getNumberValue(histories[i].Close), getNumberValue(histories[i].Volume)] });
-                        }
-                        client.batch(batchQueries, { prepare: true }, function (err) {
+
+                        var params = [stock.stock_symbol, getNumberFromArr(details._52Weeks, 0), getNumberFromArr(details._52Weeks, 1),
+                        getNumberValue(details.beta), getNumberValue(details.change)
+                        ];
+                        console.log(params);
+                        /*
+                        client.execute(insert, params, { prepare: true }, function (err, result) {
                             if (err) {
                                 // Do nothing
-                                console.log(err);
                             }
-                            if (++stockCount === stocks.length) next();
+                            if (++stockCount == stocks.length) {
+                                next();
+                            }
                         });
+                        */
                     } else {
-                        if (++stockCount === stocks.length) next();
+                        if (++stockCount == stocks.length) {
+                            next();
+                        }
                     }
-                } else {
-                    if (++stockCount === stocks.length) next();
+                } catch (e) {
+                    console.log('Unable to process ' + filePath, e.message);
                 }
             }
-            */
-            
         }
     ], function (err) {
         if (err) {
@@ -104,6 +116,17 @@ try {
 } catch (e) {
     console.error(e.message);
     process.exit(1);
+}
+
+function getNumberFromArr(arr, index) {
+    try {
+        var values = arr.split('-');
+        if (values.length > 0) {
+            return parseFloat(values[index]);
+        }
+    } catch (e) {
+        return 0;
+    }
 }
 
 function getNumberValue(val) {

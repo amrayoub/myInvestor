@@ -2,7 +2,6 @@
  * Node.js script to insert stocks into Cassandra database.
  * 
  */
-
 "use strict";
 
 const CASSANDRA_HOST = 'localhost';
@@ -75,5 +74,3 @@ try {
     console.error(e.message);
     process.exit(1);
 }
-
-

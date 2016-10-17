@@ -88,8 +88,6 @@ function getStockInfo(stocks, counter) {
                     return value.toString().replace(/["'()]/g, "").replace(re, "");
                 }
 
-                var stockInfo = [];
-
                 // Current price
                 var current = getValue(document, '#price-panel > div:nth-child(1) > span');
 
@@ -135,13 +133,12 @@ function getStockInfo(stocks, counter) {
                 // Inst. own
                 var instOwn = getValue(document, '#market-data-div > div.snap-panel-and-plusone > div.snap-panel > table:nth-child(2) > tbody > tr:nth-child(5) > td.val');
 
-                stockInfo.push({
+                return {
                     current: current, change: change, changePercentage: changePercentage,
                     time: time, range: range, dividendYield: dividendYield, _52Weeks: _52Weeks,
                     eps: eps, open: open, shares: shares, volume: volume, beta: beta,
                     marketCapital: marketCapital, pe: pe, instOwn: instOwn
-                });
-                return stockInfo;
+                };               
             });
 
             // Write to output file
