@@ -56,7 +56,7 @@ CREATE TABLE stock_details
     details_time TEXT,
     details_volume TEXT,
     details_extracted_timestamp TIMESTAMP,  
-    PRIMARY KEY(stock_symbol, details_extracted_timestamp
+    PRIMARY KEY(stock_symbol, details_extracted_timestamp)
 );
 
 

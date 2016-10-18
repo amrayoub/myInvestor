@@ -83,19 +83,23 @@ try {
 
 
                         var params = [stock.stock_symbol, getNumberFromArr(details._52Weeks, 0), getNumberFromArr(details._52Weeks, 1),
-                        getNumberValue(details.beta), getNumberValue(details.change)
+                        getNumberValue(details.beta), getNumberValue(details.change), getPercentageValue(details.changePercentage),
+                        getNumberValue(details.current), getStringValue(details.dividendYield), getNumberValue(details.eps),
+                        getPercentageValue(details.instOwn), getStringValue(details.marketCapital), getNumberValue(details.open),
+                        getNumberValue(details.pe), getNumberFromArr(details.range, 0), getNumberFromArr(details.range, 1),
+                        getStringValue(details.shares), getStringValue(details.time), getStringValue(details.volume), (new Date()).yyyymmdd()
                         ];
-                        console.log(params);
-                        /*
+                        //console.log(params);
+                        
                         client.execute(insert, params, { prepare: true }, function (err, result) {
                             if (err) {
                                 // Do nothing
-                            }
+                                console.log(err);
+                            } 
                             if (++stockCount == stocks.length) {
                                 next();
                             }
-                        });
-                        */
+                        });                        
                     } else {
                         if (++stockCount == stocks.length) {
                             next();
@@ -118,6 +122,10 @@ try {
     process.exit(1);
 }
 
+function getPercentageValue(value) {
+    return getNumberValue(value).toString().replace('%', '');
+}
+
 function getNumberFromArr(arr, index) {
     try {
         var values = arr.split('-');
@@ -134,21 +142,14 @@ function getNumberValue(val) {
     return val;
 }
 
-function zeroFill(number, width) {
-    width -= number.toString().length;
-    if (width > 0) {
-        return new Array(width + (/\./.test(number) ? 2 : 1)).join('0') + number;
-    }
-    return number + ""; // always return a string
+function getStringValue(val) {
+    if (val === '-') return '';
+    return val;
 }
 
-function parseDate(s) {
-    var months = {
-        jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
-        jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
-    };
-    var p = s.split('-');
-    if (p.length >= 3)
-        return (parseInt(p[2]) + 2000) + "-" + zeroFill(months[p[1].toLowerCase()], 2) + "-" + zeroFill(p[0], 2);
-    return '';
-}
+Date.prototype.yyyymmdd = function() {
+  var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
+  var dd = this.getDate().toString();
+
+  return (this.getFullYear()) + '-' +  (mm.length===2 ? '' : '0', mm)  + '-' + (dd.length===2 ? '' : '0', dd); // padding
+};
