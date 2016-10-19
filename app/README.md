@@ -1,0 +1,1 @@
+Android app developed using Cordova and Ionic 2 frameworks.

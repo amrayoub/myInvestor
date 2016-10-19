@@ -1,2 +1,2 @@
 # myInvestor
-Cassandra scripts
+Cassandra scripts for the backend storage.
