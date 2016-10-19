@@ -79,7 +79,7 @@ try {
                             'details_time,' +
                             'details_volume,' +
                             'details_extracted_timestamp' +
-                            ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                            ') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) IF NOT EXISTS';
 
 
                         var params = [stock.stock_symbol, getNumberFromArr(details._52Weeks, 0), getNumberFromArr(details._52Weeks, 1),
@@ -90,23 +90,27 @@ try {
                         getStringValue(details.shares), getStringValue(details.time), getStringValue(details.volume), (new Date()).yyyymmdd()
                         ];
                         //console.log(params);
-                        
+
                         client.execute(insert, params, { prepare: true }, function (err, result) {
                             if (err) {
                                 // Do nothing
                                 console.log(err);
-                            } 
+                            }
                             if (++stockCount == stocks.length) {
                                 next();
                             }
-                        });                        
+                        });
                     } else {
                         if (++stockCount == stocks.length) {
                             next();
                         }
                     }
                 } catch (e) {
-                    console.log('Unable to process ' + filePath, e.message);
+                    console.log('Unable to process ' + filePath, e.message, e);
+                    if (++stockCount == stocks.length) {
+                        next();
+                    }
+
                 }
             }
         }
@@ -138,7 +142,7 @@ function getNumberFromArr(arr, index) {
 }
 
 function getNumberValue(val) {
-    if (val === '-') return 0;
+    if (val === '-' || val === '') return 0;
     return val;
 }
 
@@ -147,9 +151,9 @@ function getStringValue(val) {
     return val;
 }
 
-Date.prototype.yyyymmdd = function() {
-  var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
-  var dd = this.getDate().toString();
+Date.prototype.yyyymmdd = function () {
+    var mm = (this.getMonth() + 1).toString(); // getMonth() is zero-based
+    var dd = this.getDate().toString();
 
-  return (this.getFullYear()) + '-' +  (mm.length===2 ? '' : '0', mm)  + '-' + (dd.length===2 ? '' : '0', dd); // padding
+    return (this.getFullYear()) + '-' + (mm.length === 2 ? '' : '0', mm) + '-' + (dd.length === 2 ? '' : '0', dd); // padding
 };
