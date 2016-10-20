@@ -49,3 +49,7 @@ Temporary Items
 node_modules/
 KLSE/
 .vscode/
+.metadata/
+.bin/
+.settings/
+.idea/
