@@ -1,1 +1,1 @@
-Data analytics using Java, Apache Spark, Cassandra.
+Data analytics using Java, Scala Apache Spark, Cassandra.
