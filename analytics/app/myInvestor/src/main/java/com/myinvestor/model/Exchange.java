@@ -1,7 +1,23 @@
 package com.myinvestor.model;
 
+import lombok.*;
+
+import java.io.Serializable;
+
 /**
- * Created by MEKOH on 10/22/2016.
+ * Stock exchange.
  */
-public class Exchange {
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class Exchange implements Serializable {
+
+    @Getter
+    @Setter
+    private Integer exchangeId;
+
+    @Getter
+    @Setter
+    private String exchangeName;
+
 }

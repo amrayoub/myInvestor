@@ -4,5 +4,5 @@ package com.myinvestor;
  * SimpleApp specific configuration.
  *
  */
-public class Applicaction {
+public class Application {
 }

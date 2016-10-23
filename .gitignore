@@ -53,3 +53,6 @@ KLSE/
 .bin/
 .settings/
 .idea/
+.gradle/
+myinvestor.log
+*.class

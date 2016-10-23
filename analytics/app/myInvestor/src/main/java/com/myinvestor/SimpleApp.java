@@ -10,10 +10,10 @@ import org.apache.spark.api.java.function.Function;
  * Simple app for testing
  */
 @Slf4j
-public class Application {
+public class SimpleApp {
     public static void main(String[] args) {
         String logFile = "C:\\myspace\\2016\\Development\\myStock\\spark-2.0.1-bin-hadoop2.7\\README.md"; // Should be some file on your system
-        SparkConf conf = new SparkConf().setAppName("Simple Application");
+        SparkConf conf = new SparkConf().setAppName("Simple App");
         JavaSparkContext sc = new JavaSparkContext(conf);
         JavaRDD<String> logData = sc.textFile(logFile).cache();
 
