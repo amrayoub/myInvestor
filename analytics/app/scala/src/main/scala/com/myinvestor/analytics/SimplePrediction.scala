@@ -1,8 +1,14 @@
 package com.myinvestor.analytics
 
-/**
-  * Created by MEKOH on 10/30/2016.
-  */
-class SimplePrediction {
+import com.myinvestor.model.CassandraModel.Stock
+import org.apache.spark.SparkContext
 
+/**
+  * Simple prediction used for testing.
+  */
+class SimplePrediction extends Serializable {
+
+  def perform(sc: SparkContext, stock: Stock) {
+    println(stock.stockName)
+  }
 }

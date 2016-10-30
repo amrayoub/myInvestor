@@ -1,14 +1,12 @@
-package com.myinvestor.analytics
+package com.myinvestor
 
-import com.myinvestor.common.Settings
-import com.typesafe.scalalogging.Logger
-import org.apache.spark.{SparkConf, SparkContext}
 import com.datastax.spark.connector._
-import com.datastax.spark.connector.mapper._
-import com.datastax.spark.connector.rdd.CassandraRDD
+import com.myinvestor.analytics.SimplePrediction
+import com.myinvestor.common.Settings
 import com.myinvestor.model.CassandraModel.{Stock, StockHistory}
 import com.myinvestor.model.CassandraSchema
-import eu.verdelhan.ta4j.Tick
+import com.typesafe.scalalogging.Logger
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
   * Perform prediction.
@@ -25,8 +23,9 @@ object Predict {
       .set("spark.cassandra.auth.password", settings.cassandraUserPassword)
     val sc = new SparkContext(settings.sparkMaster, settings.sparkAppName, sparkConf)
 
-    val stockRdd = sc.cassandraTable[Stock](CassandraSchema.KEYSPACE, CassandraSchema.STOCK_TABLE).where("exchange_id = ?", settings.exchangeId)
-    stockRdd.foreach { stock =>
+    // Get the stock as list instead of RDD
+    val stocks = sc.cassandraTable[Stock](CassandraSchema.KEYSPACE, CassandraSchema.STOCK_TABLE).where("exchange_id = ?", settings.exchangeId).collect()
+    stocks.foreach { stock =>
       // Get the stock history for this stock
       val stockHistory = sc.cassandraTable[StockHistory](CassandraSchema.KEYSPACE, CassandraSchema.STOCK_HISTORY_TABLE).select(
         CassandraSchema.STOCK_SYMBOL_COLUMN, CassandraSchema.HISTORY_DATE, CassandraSchema.HISTORY_CLOSE, CassandraSchema.HISTORY_HIGH,

@@ -56,3 +56,4 @@ KLSE/
 .gradle/
 myinvestor.log
 *.class
+target/
