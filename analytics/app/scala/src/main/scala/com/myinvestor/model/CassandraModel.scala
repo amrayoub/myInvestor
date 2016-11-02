@@ -1,12 +1,11 @@
 package com.myinvestor.model
 
-import java.io.Serializable
-import java.util.Date
+import org.joda.time.DateTime
 
 object CassandraModel {
 
   @SerialVersionUID(1L)
-  sealed trait Model extends Serializable
+  sealed trait DatabaseModel extends Serializable
 
 
   /**
@@ -15,7 +14,7 @@ object CassandraModel {
     * @param exchangeId
     * @param exchangeName
     */
-  case class Exchange(exchangeId: Int, exchangeName: String) extends Model
+  case class Exchange(exchangeId: Int, exchangeName: String) extends DatabaseModel
 
   /**
     * Stock model.
@@ -24,7 +23,7 @@ object CassandraModel {
     * @param exchangeId
     * @param stockName
     */
-  case class Stock(stockSymbol: String, exchangeId: Int, stockName: String) extends Model
+  case class Stock(stockSymbol: String, exchangeId: Int, stockName: String) extends DatabaseModel
 
   /**
     * Stock history model.
@@ -37,9 +36,9 @@ object CassandraModel {
     * @param historyOpen
     * @param historyVolume
     */
-  case class StockHistory(stockSymbol: String, historyDate: Date,
+  case class StockHistory(stockSymbol: String, historyDate: DateTime,
                           historyClose: Double, historyHigh: Double,
                           historyLow: Double, historyOpen: Double,
-                          historyVolume: Int) extends Model
+                          historyVolume: Double) extends DatabaseModel
 
 }
