@@ -2,12 +2,11 @@ package com.myinvestor.analytics
 
 import java.util
 
-import com.myinvestor.model.ApplicationModel.StockTick
 import com.myinvestor.model.CassandraModel.{Stock, StockHistory}
-import eu.verdelhan.ta4j.{Strategy, Tick, TimeSeries}
+import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator
+import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator
+import eu.verdelhan.ta4j.{Tick, TimeSeries}
 import org.apache.spark.rdd.RDD
-
-import scala.collection.JavaConversions._
 
 /**
   * Simple prediction used for testing.
@@ -24,10 +23,19 @@ class TestPrediction {
     histories.foreach { history =>
       ticks.add(new Tick(history.historyDate, history.historyOpen, history.historyHigh, history.historyLow, history.historyClose, history.historyVolume))
     }
-    val timeService = new TimeSeries(stock.stockSymbol, ticks)
+    val series = new TimeSeries(stock.stockSymbol, ticks)
 
     // Building the trading strategy
-    val strategy  = MovingMomentumStrategy.buildStrategy(series);
+    val firstClosePrice = series.getTick(0).getClosePrice();
+    println(firstClosePrice.toDouble)
+
+    val closePrice = new ClosePriceIndicator(series)
+    println(firstClosePrice.isEqual(closePrice.getValue(0)))
+
+    val shortSma = new SMAIndicator(closePrice, 5)
+    println("5-ticks-SMA value at the 42nd index: " + shortSma.getValue(42).toDouble())
+
+    val longSma = new SMAIndicator(closePrice, 30)
 
   }
 }

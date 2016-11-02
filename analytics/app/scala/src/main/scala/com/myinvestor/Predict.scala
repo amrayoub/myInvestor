@@ -30,7 +30,7 @@ object Predict {
     val stocks = sc.cassandraTable[Stock](CassandraSchema.KEYSPACE, CassandraSchema.STOCK_TABLE).where(CassandraSchema.EXCHANGE_ID_COLUMN + " = ?", settings.exchangeId).collect()
 
     // Test the algorithm using 1 stock now
-    val stock = Stock("YTLPOWR", 1, "YTL Power")
+    val stock = Stock("YTLPOWR", 1, "YTL Power")  // Sample stock
     val stockHistoryRdd = sc.cassandraTable[StockHistory](CassandraSchema.KEYSPACE, CassandraSchema.STOCK_HISTORY_TABLE).select(
       CassandraSchema.STOCK_SYMBOL_COLUMN, CassandraSchema.HISTORY_DATE, CassandraSchema.HISTORY_CLOSE, CassandraSchema.HISTORY_HIGH,
       CassandraSchema.HISTORY_LOW, CassandraSchema.HISTORY_OPEN, CassandraSchema.HISTORY_VOLUME
