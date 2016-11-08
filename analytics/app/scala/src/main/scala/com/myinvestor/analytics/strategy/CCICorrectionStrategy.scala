@@ -15,9 +15,9 @@ import eu.verdelhan.ta4j.{Decimal, Strategy, TimeSeries}
   */
 class CCICorrectionStrategy {
 
-  def build(series: TimeSeries): Strategy = {
+  def builder(series: TimeSeries): Strategy = {
     if (series == null) {
-      throw new IllegalArgumentException("Series cannot be null");
+      throw new IllegalArgumentException("Series cannot be null")
     }
 
     val longCci = new CCIIndicator(series, 200)
@@ -33,6 +33,6 @@ class CCICorrectionStrategy {
 
     val strategy = new Strategy(entryRule, exitRule)
     strategy.setUnstablePeriod(5)
-    return strategy
+    strategy
   }
 }
