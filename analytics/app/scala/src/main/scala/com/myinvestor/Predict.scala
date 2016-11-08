@@ -1,7 +1,7 @@
 package com.myinvestor
 
 import com.datastax.spark.connector._
-import com.myinvestor.analytics.TestPrediction
+import com.myinvestor.analytics.CCICorrection
 import com.myinvestor.common.Settings
 import com.myinvestor.model.CassandraModel.{Stock, StockHistory}
 import com.myinvestor.model.CassandraSchema
@@ -24,7 +24,7 @@ object Predict {
     val sc = new SparkContext(settings.sparkMaster, settings.sparkAppName, sparkConf)
 
     // Set the analytics algorithm
-    val prediction = new TestPrediction()
+    val prediction = new CCICorrection()
 
     // Get the stock as list instead of RDD
     val stocks = sc.cassandraTable[Stock](CassandraSchema.KEYSPACE, CassandraSchema.STOCK_TABLE).where(CassandraSchema.EXCHANGE_ID_COLUMN + " = ?", settings.exchangeId).collect()

@@ -9,7 +9,7 @@ import eu.verdelhan.ta4j.{Tick, TimeSeries}
 import org.apache.spark.rdd.RDD
 
 /**
-  * Created by MEKOH on 11/8/2016.
+  * CCI (Commodity Channel Index) Correction strategy.
   */
 class CCICorrection {
 
