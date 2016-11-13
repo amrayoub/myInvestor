@@ -57,3 +57,27 @@ KLSE/
 myinvestor.log
 *.class
 target/
+
+*.log
+*.DS_Store*
+# sbt specific
+.cache/
+.history/
+.lib/
+dist/*
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+.idea
+.idea_modules
+/tmp
+spark-cassandra-timeseries/tmp/
+test-output
+
+diagrams/*.graffle
+*.suml*

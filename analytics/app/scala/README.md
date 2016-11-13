@@ -1,2 +1,0 @@
-# myInvestor Analytics
-

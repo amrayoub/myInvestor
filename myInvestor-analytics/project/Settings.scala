@@ -13,7 +13,7 @@ object Settings extends Build {
     organization := "com.myInvestor",
     organizationHomepage := Some(url("http://www.github.com/mengwangk/myinvestor")),
     scalaVersion := Versions.Scala,
-    homepage := Some(url("https://github.com/killrweather/killrweather")),
+    homepage := Some(url("https://github.com/mengwangk/myInvestor")),
     licenses := Seq(("Apache License, Version 2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))),
     promptTheme := ScalapenosTheme
   )
@@ -25,7 +25,7 @@ object Settings extends Build {
     publish := {}
   )
 
-  lazy val defaultSettings = testSettings ++ graphSettings ++ sigarSettings ++ Seq(
+  lazy val defaultSettings = testSettings ++ graphSettings ++ Seq(
     autoCompilerPlugins := true,
     // removed "-Xfatal-warnings" as temporary workaround for log4j fatal error.
     scalacOptions ++= Seq("-encoding", "UTF-8", s"-target:jvm-${Versions.JDK}", "-feature", "-language:_", "-deprecation", "-unchecked", "-Xlint"),

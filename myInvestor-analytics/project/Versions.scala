@@ -1,0 +1,20 @@
+object Versions {
+
+  val Akka           = "2.4.12"
+  val AkkaStreams    = "2.4.12"
+  val Albebird       = "0.11.0"
+  val Bijection      = "0.9.2"
+  val CassandraDriver = "3.1.2"
+  val JDK            = "1.8"
+  val JodaConvert    = "1.8"
+  val JodaTime       = "2.9.6"
+  val Json4s         = "3.5.0"
+  val Kafka          = "0.10.1.0"
+  val Logback        = "1.1.7"
+  val Scala          = "2.11.8"
+  val ScalaTest      = "3.0.1-SNAP1"
+  val Sigar          = "1.6.4"
+  val Slf4j          = "1.7.21"
+  val Spark          = "2.0.1"
+  val SparkCassandra = "2.0.0-M3"
+}
