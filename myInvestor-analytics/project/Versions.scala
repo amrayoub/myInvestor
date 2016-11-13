@@ -17,4 +17,7 @@ object Versions {
   val Slf4j          = "1.7.21"
   val Spark          = "2.0.1"
   val SparkCassandra = "2.0.0-M3"
+  val ScalaLogging   = "3.5.0"
+  val ScalaLoggingSlf4j   = "2.1.2"
+  val TAVersion   = "0.8"
 }

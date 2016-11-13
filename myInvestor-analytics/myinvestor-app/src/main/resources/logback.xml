@@ -2,14 +2,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n
-            </pattern>
-        </encoder>
-    </appender>
-
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%msg%n</pattern>
+            <pattern>[%level] [%date{ISO8601}] [%logger]: %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -21,7 +14,26 @@
         </encoder>
     </appender>
 
-    <root level="ERROR">
+    <!-- Change to debug to see data pathway logging. -->
+    <logger name="com.datastax.killrweather" level="DEBUG"/>
+    <logger name="com.datastax.killrweather.cluster" level="INFO"/>
+    <logger name="akka.cluster" level="INFO"/>
+    <logger name="akka.cluster.ClusterHeartbeatSender" level="WARN"/>
+
+    <logger name="com.datastax.driver" level="WARN"/>
+    <logger name="com.datastax.spark" level="WARN"/>
+    <logger name="org.apache.spark" level="WARN"/>
+    <logger name="kafka" level="ERROR"/>
+
+    <logger name="org.apache.zookeeper" level="ERROR"/>
+    <logger name="org.eclipse.jetty" level="ERROR"/>
+    <logger name="org.apache.spark.storage.BlockManager" level="ERROR"/>
+    <logger name="org.apache.thrift" level="ERROR"/>
+    <logger name="org.apache.cassandra.db.SystemKeyspace" level="ERROR"/>
+    <logger name="org.apache.spark.storage.BlockManager" level="ERROR"/>
+    <logger name="org.apache.hadoop" level="ERROR"/>
+
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOGFILE"/>
     </root>

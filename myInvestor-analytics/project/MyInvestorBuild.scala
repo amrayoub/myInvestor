@@ -97,6 +97,9 @@ object Dependencies {
     val sparkCassandra    = "com.datastax.spark"  %% "spark-cassandra-connector"          % SparkCassandra // ApacheV2
     val sparkCassandraEmb = "com.datastax.spark"  %% "spark-cassandra-connector-embedded" % SparkCassandra embeddedExclusions // ApacheV2
     val sigar             = "org.fusesource"      % "sigar"                               % Sigar
+    val scalaLogging      = "com.typesafe.scala-logging" %% "scala-logging"               % ScalaLogging
+    val scalaLoggingSlf4j = "com.typesafe.scala-logging" %% "scala-logging-slf4j"         % ScalaLoggingSlf4j
+    val technicalAnalysis = "eu.verdelhan"        % "ta4j"                                % TAVersion
   }
 
   object Test {
@@ -112,18 +115,20 @@ object Dependencies {
 
   val json = Seq(json4sCore, json4sJackson, json4sNative)
 
-  val logging = Seq(logback, slf4jApi)
+  val logging = Seq(logback, slf4jApi, scalaLoggingSlf4j, scalaLogging)
 
   val time = Seq(jodaConvert, jodaTime)
 
   val test = Seq(Test.akkaTestKit, Test.scalatest)
+
+  val ta = Seq(technicalAnalysis)
 
   /** Module deps */
   val client = akka ++ logging ++ Seq(sparkCassandraEmb, sigar)
 
   val core = akka ++ logging ++ time
 
-  val app = connector ++ json ++ test ++
+  val app = connector ++ json ++ test ++ ta ++
     Seq(algebird, bijection, kafka, kafkaStreaming, sparkML, sigar)
 
   val example = connector ++ time ++ json ++
