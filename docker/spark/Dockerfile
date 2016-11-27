@@ -1,18 +1,21 @@
-FROM ubuntu:16.04
+FROM ubuntu:latest
 
 MAINTAINER mengwangk@gmail.com
 
 ####installing [software-properties-common] so that we can use [apt-add-repository] to install Java8
-RUN apt-get update && apt-get install software-properties-common -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+software-properties-common \
+sudo \
 &&  apt-add-repository ppa:webupd8team/java -y \
-&&  apt-get update -y \
+&& apt-get update \
 
 ####automatically agreeing on oracle license agreement [for installing java]
 &&  echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections \
 &&  echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections \
 
 ####installing java and supervisor
-&&  apt-get install -y oracle-java8-installer \
+&&  apt-get install -y --no-install-recommends \
+	oracle-java8-installer \
     supervisor
 
 

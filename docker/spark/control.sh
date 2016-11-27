@@ -1,16 +1,16 @@
 #!/bin/bash
 
-BUILD_TAG=myinvestor-spark
+DOCKER_USER_NAME=mengwangk
+BUILD_TAG=$DOCKER_USER_NAME/myinvestor-spark
 RUN_NAME=myinvestor-engine
-DB_DIR=$HOME/$RUN_NAME
-DB_SCRIPT_DIR=$HOME/$RUN_NAME-staging
+SPARK_NETWORK=spark-network
 
 
 build() {
     echo
     echo "==== build ===="
 
-    sudo docker build -t $BUILD_TAG .   
+    sudo docker-compose build 
 
     echo   
 }
@@ -19,12 +19,8 @@ start() {
 
     echo
     echo "==== start ===="
-
-	# Create folder if not exists
-	[ -d $DB_DIR ] || mkdir -p $DB_DIR
-	[ -d $DB_SCRIPT_DIR ] || mkdir -p $DB_SCRIPT_DIR
-
-    sudo docker run --name $RUN_NAME -v $DB_DIR:/var/lib/cassandra -v $DB_SCRIPT_DIR:/staging -d -p 7199:7199 -p 7000:7000 -p 7001:7001 -p 9160:9160 -p 9042:9042 $BUILD_TAG   
+    sudo network create $SPARK_NETWORK
+    sudo docker-compose up -d && docker-compose scale slave=1; 
 
     echo    
 }
@@ -34,8 +30,8 @@ stop() {
     echo
     echo "==== stop ===="
 
-    sudo docker stop $RUN_NAME   
-    sudo docker rm $RUN_NAME   
+    sudo docker-compose down
+    sudo docker network rm $SPARK_NETWORK
 
     echo    
 }
@@ -50,17 +46,13 @@ status() {
     echo    
 }
 
-cqlsh() {
-
+shell() {
     echo
-    echo "==== cqlsh ===="
+    echo "==== shell ===="
 
-	# Create folder if not exists
-	[ -d $DB_SCRIPT_DIR ] || mkdir -p $DB_SCRIPT_DIR
+    sudo docker ps -a | grep $RUN_NAME
 
-	sudo docker run -it -v $DB_SCRIPT_DIR:/staging --link $RUN_NAME:cassandra --rm cassandra sh -c 'exec cqlsh "$CASSANDRA_PORT_9042_TCP_ADDR"'
-	
-	echo
+    echo     
 }
 
 command() {
@@ -73,6 +65,13 @@ command() {
 	echo
 }
 
+push(){
+    echo
+    echo "==== push ===="
+	sudo docker push $BUILD_TAG
+	
+	echo
+}
 
 case "$1" in
     'build')
@@ -91,15 +90,15 @@ case "$1" in
             stop ; echo "Sleeping..."; sleep 1 ;
             start
             ;;
-    'cqlsh')
-            cqlsh 
+    'push')
+            push 
             ;;
     'command')
             command
             ;;
     *)
             echo
-            echo "Usage: $0 { build | start | stop | restart | status | cqlsh | command }"
+            echo "Usage: $0 { build | start | stop | restart | status | push | command }"
             echo
             exit 1
             ;;

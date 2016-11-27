@@ -1,10 +1,10 @@
 #!/bin/bash
 
-BUILD_TAG=myinvestor-cassandra
+DOCKER_HUB_USER=mengwangk
+BUILD_TAG=$DOCKER_HUB_USER/myinvestor-cassandra
 RUN_NAME=myinvestor-db
 DB_DIR=$HOME/$RUN_NAME
 DB_SCRIPT_DIR=$HOME/$RUN_NAME-staging
-
 
 build() {
     echo
@@ -73,6 +73,17 @@ command() {
 	echo
 }
 
+push(){
+    echo
+    echo "==== push ===="
+	TAG=`sudo docker images | grep $BUILD_TAG | awk '{print $3}'`
+	echo "Pushing $TAG to Docker Hub"
+	#sudo docker tag $TAG $DOCKER_HUB_USER/$BUILD_TAG:latest
+	sudo docker push $BUILD_TAG
+
+	echo
+}
+
 
 case "$1" in
     'build')
@@ -97,9 +108,12 @@ case "$1" in
     'command')
             command
             ;;
+    'push')
+            push 
+            ;;
     *)
             echo
-            echo "Usage: $0 { build | start | stop | restart | status | cqlsh | command }"
+            echo "Usage: $0 { build | start | stop | restart | status | cqlsh | command | push }"
             echo
             exit 1
             ;;

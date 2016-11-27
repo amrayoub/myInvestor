@@ -10,10 +10,14 @@ version: '2'
 services:
   master:
     build: .
+    networks:
+      - default
     image: mengwangk/myinvestor-spark
-    container_name: master
+    container_name: myinvestor-engine
     ports:
       - "8080:8080"
+      - "7077:7077"
+      - "8081:8081"
     command: ["/usr/bin/supervisord", "--configuration=/opt/conf/master.conf"]
 #---------------------------------------
   slave:
@@ -21,3 +25,8 @@ services:
     depends_on:
       - master
     command: ["/usr/bin/supervisord", "--configuration=/opt/conf/slave.conf"]
+
+networks:
+  default:
+    external:
+      name: spark-network
