@@ -30,8 +30,10 @@ COPY master.conf /opt/conf/master.conf
 COPY slave.conf /opt/conf/slave.conf
 
 
-#######exposing port 8080 for spark master UI
+#######exposing ports
 EXPOSE 8080
+EXPOSE 8081
+EXPOSE 7077
 
 #default command: running an interactive spark shell in the local mode
 CMD ["/opt/spark/bin/spark-shell", "--master", "local[*]"]
