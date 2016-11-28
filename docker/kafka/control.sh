@@ -44,19 +44,6 @@ status() {
     echo    
 }
 
-cqlsh() {
-
-    echo
-    echo "==== cqlsh ===="
-
-	# Create folder if not exists
-	[ -d $DB_SCRIPT_DIR ] || mkdir -p $DB_SCRIPT_DIR
-
-	sudo docker run -it -v $DB_SCRIPT_DIR:/staging --link $RUN_NAME:cassandra --rm cassandra sh -c 'exec cqlsh "$CASSANDRA_PORT_9042_TCP_ADDR"'
-	
-	echo
-}
-
 command() {
 
     echo
@@ -96,9 +83,6 @@ case "$1" in
             stop ; echo "Sleeping..."; sleep 1 ;
             start
             ;;
-    'cqlsh')
-            cqlsh 
-            ;;
     'command')
             command
             ;;
@@ -107,7 +91,7 @@ case "$1" in
             ;;
     *)
             echo
-            echo "Usage: $0 { build | start | stop | restart | status | cqlsh | command | push }"
+            echo "Usage: $0 { build | start | stop | restart | status | command | push }"
             echo
             exit 1
             ;;
