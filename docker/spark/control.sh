@@ -19,7 +19,7 @@ start() {
 
     echo
     echo "==== start ===="
-    sudo network create $SPARK_NETWORK
+    sudo docker network create $SPARK_NETWORK
     sudo docker-compose up -d && docker-compose scale slave=1; 
 
     echo    
@@ -50,7 +50,7 @@ shell() {
     echo
     echo "==== shell ===="
 
-    sudo docker ps -a | grep $RUN_NAME
+    sudo docker run -it --net $SPARK_NETWORK $BUILD_TAG /opt/spark/bin/spark-shell --master spark://master:7077
 
     echo     
 }
@@ -96,9 +96,13 @@ case "$1" in
     'command')
             command
             ;;
+    'shell')
+            shell
+            ;;
+   
     *)
             echo
-            echo "Usage: $0 { build | start | stop | restart | status | push | command }"
+            echo "Usage: $0 { build | start | stop | restart | status | push | command | shell}"
             echo
             exit 1
             ;;
