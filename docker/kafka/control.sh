@@ -18,7 +18,8 @@ start() {
     echo
     echo "==== start ===="
 
-    sudo docker run --name $RUN_NAME -v $DB_DIR:/var/lib/cassandra -v $DB_SCRIPT_DIR:/staging -d -p 7199:7199 -p 7000:7000 -p 7001:7001 -p 9160:9160 -p 9042:9042 $BUILD_TAG   
+    sudo docker run --name $RUN_NAME -d -p 2181:2181 -p 9092:9092 $BUILD_TAG
+	#--env ADVERTISED_HOST=`sudo docker-machine ip \`sudo docker-machine active\`` --env ADVERTISED_PORT=9092 $BUILD_TAG
 
     echo    
 }
@@ -49,20 +50,20 @@ command() {
     echo
     echo "==== command ===="
 
-	sudo docker exec -it $RUN_NAME bash
+    sudo docker exec -it $RUN_NAME bash
 	
-	echo
+    echo
 }
 
 push(){
     echo
     echo "==== push ===="
-	TAG=`sudo docker images | grep $BUILD_TAG | awk '{print $3}'`
-	echo "Pushing $TAG to Docker Hub"
-	#sudo docker tag $TAG $DOCKER_HUB_USER/$BUILD_TAG:latest
-	sudo docker push $BUILD_TAG
+    TAG=`sudo docker images | grep $BUILD_TAG | awk '{print $3}'`
+    echo "Pushing $TAG to Docker Hub"
+    #sudo docker tag $TAG $DOCKER_HUB_USER/$BUILD_TAG:latest
+    sudo docker push $BUILD_TAG
 
-	echo
+    echo
 }
 
 
