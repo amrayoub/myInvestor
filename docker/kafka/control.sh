@@ -3,6 +3,10 @@
 DOCKER_HUB_USER=mengwangk
 BUILD_TAG=$DOCKER_HUB_USER/myinvestor-kafka
 RUN_NAME=myinvestor-streaming
+ZOOKEEPER="--zookeeper localhost:2181"
+BROKER_LIST="--broker-list localhost:9092"
+
+ARGS=$@
 
 build() {
     echo
@@ -55,6 +59,73 @@ command() {
     echo
 }
 
+zookeeper() {
+    echo
+    echo "==== zookeeper ===="
+
+    sudo docker exec -it $RUN_NAME /usr/share/zookeeper/bin/zkCli.sh -server 127.0.0.1:2181
+	
+    echo
+}
+
+topic () {
+    echo
+    echo "==== topic ===="
+  
+    TOPIC_ARGS=""  
+    COUNT=0 
+    for arg in $ARGS
+    do
+       COUNT=$((COUNT + 1))
+       if [ "$COUNT" != "1" ]; then
+	  TOPIC_ARGS+=" "
+          TOPIC_ARGS+=$arg
+       fi
+    done
+    #echo $TOPIC_ARGS
+    sudo docker exec -it $RUN_NAME /opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh $ZOOKEEPER $TOPIC_ARGS
+	
+    echo
+}
+
+producer() {
+    echo
+    echo "==== producer  ===="
+  
+    PRODUCER_ARGS=""  
+    COUNT=0 
+    for arg in $ARGS
+    do
+       COUNT=$((COUNT + 1))
+       if [ "$COUNT" != "1" ]; then
+	  PRODUCER_ARGS+=" "
+          PRODUCER_ARGS+=$arg
+       fi
+    done
+    sudo docker exec -it $RUN_NAME /opt/kafka_2.11-0.10.1.0/bin/kafka-console-producer.sh $BROKER_LIST --topic $PRODUCER_ARGS
+	
+    echo
+}
+
+consumer() {
+    echo
+    echo "==== consumer ===="
+  
+    CONSUMER_ARGS=""  
+    COUNT=0 
+    for arg in $ARGS
+    do
+       COUNT=$((COUNT + 1))
+       if [ "$COUNT" != "1" ]; then
+	  CONSUMER_ARGS+=" "
+          CONSUMER_ARGS+=$arg
+       fi
+    done
+    sudo docker exec -it $RUN_NAME /opt/kafka_2.11-0.10.1.0/bin/kafka-console-consumer.sh $ZOOKEEPER --topic $CONSUMER_ARGS --from-beginning
+	
+    echo
+}
+
 push(){
     echo
     echo "==== push ===="
@@ -90,9 +161,21 @@ case "$1" in
     'push')
             push 
             ;;
+    'zookeeper')
+            zookeeper
+            ;;
+    'topic')
+            topic 
+            ;;
+    'producer')
+            producer 
+            ;;
+    'consumer')
+            consumer
+            ;;
     *)
             echo
-            echo "Usage: $0 { build | start | stop | restart | status | command | push }"
+            echo "Usage: $0 { build | start | stop | restart | status | command | push | zookeeper | topic | producer | consumer}"
             echo
             exit 1
             ;;
