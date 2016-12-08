@@ -15,8 +15,8 @@
     </appender>
 
     <!-- Change to debug to see data pathway logging. -->
-    <logger name="com.datastax.killrweather" level="DEBUG"/>
-    <logger name="com.datastax.killrweather.cluster" level="INFO"/>
+    <logger name="com.myinvestor" level="DEBUG"/>
+    <logger name="com.myinvestor.cluster" level="INFO"/>
     <logger name="akka.cluster" level="INFO"/>
     <logger name="akka.cluster.ClusterHeartbeatSender" level="WARN"/>
 

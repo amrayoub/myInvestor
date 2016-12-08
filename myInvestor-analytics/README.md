@@ -1,1 +1,2 @@
-Data analytics using Java, Scala Apache Spark, Cassandra.
+# myInvestor
+Stock market data analytics using Scala, Kafka, Akka Apache Spark and Cassandra.
