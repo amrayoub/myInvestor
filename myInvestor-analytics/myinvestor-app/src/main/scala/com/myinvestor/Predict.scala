@@ -14,6 +14,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 object Predict {
 
   def main(args: Array[String]) {
+    /*
     val logger = Logger("Predict")
     val settings = new Settings()
 
@@ -38,6 +39,7 @@ object Predict {
 
     prediction.apply(stock, stockHistoryRdd)
 
+    */
     /*
     stocks.foreach { stock =>
       // Get the stock history for this stock
