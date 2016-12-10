@@ -10,7 +10,8 @@ lazy val compileSettings = Seq(
   version := Versions.myInvestor,
   scalaVersion := Versions.Scala,
   scalacOptions ++= Seq("-encoding", "UTF-8", s"-target:jvm-${Versions.JDK}", "-feature", "-language:_", "-deprecation", "-unchecked", "-Xlint"),
-  javacOptions in Compile ++= Seq("-encoding", "UTF-8", "-source", Versions.JDK, "-target", Versions.JDK, "-Xlint:deprecation", "-Xlint:unchecked")
+  javacOptions in Compile ++= Seq("-encoding", "UTF-8", "-source", Versions.JDK, "-target", Versions.JDK, "-Xlint:deprecation", "-Xlint:unchecked"),
+  run in Compile := Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
 )
 
 lazy val myinvestor = (project in file(".")).
@@ -18,15 +19,15 @@ lazy val myinvestor = (project in file(".")).
   settings(
     name := "myinvestor"
   ).
-  aggregate(core, app)
- // aggregate(core, app, client, example)
+  aggregate(core, app, client, example)
 
 
 lazy val core = (project in file("./myinvestor-core")).
   settings(compileSettings: _*).
   settings(
     name := "core",
-    libraryDependencies ++= Dependencies.core
+    libraryDependencies ++= Dependencies.core,
+    assemblyJarName in assembly := "myinvestor-core.jar"
   )
 
 
@@ -34,25 +35,29 @@ lazy val app = (project in file("./myinvestor-app")).
   settings(compileSettings: _*).
   settings(
     name := "app",
-    libraryDependencies ++= Dependencies.app
+    libraryDependencies ++= Dependencies.app,
+    assemblyJarName in assembly := "myinvestor-app.jar"
+    // mainClass in assembly := Some("com.example.Main")
   ).dependsOn(core)
 
 
-libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
-
-/*
 lazy val client = (project.dependsOn(core) in file("./myinvestor-client")).
-  settings(appSettings: _*).
   settings(compileSettings: _*).
   settings(
     name := "client",
-    libraryDependencies ++= Dependencies.client
-  )
+    libraryDependencies ++= Dependencies.client,
+    assemblyJarName in assembly := "myinvestor-client.jar"
+    // mainClass in assembly := Some("com.example.Main")
+  ).dependsOn(core)
 
 lazy val example = (project in file("./myinvestor-example")).
-  settings(appSettings: _*).
   settings(compileSettings: _*).
   settings(
     name := "example",
-    libraryDependencies ++= Dependencies.example
-  */
+    libraryDependencies ++= Dependencies.example,
+    assemblyJarName in assembly := "myinvestor-example.jar"
+    // mainClass in assembly := Some("com.example.Main")
+  ).dependsOn(core)
+  
+libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
+

@@ -12,10 +12,7 @@ object Versions {
   val myInvestor = "0.0.1"
   
   
-  // Libary versions
-  //val Akka = "2.4.14"
-  //val AkkaStreams = "2.4.14"
-  //val Kafka = "0.10.1.0"  
+  // Libary versions  
   val JDK = "1.8"
   val Scala = "2.11.8"
 
