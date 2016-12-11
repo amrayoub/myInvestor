@@ -11,8 +11,8 @@ object Dependencies {
 
     val technicalAnalysis = "eu.verdelhan" % "ta4j"% TAVersion    
     val logback = "ch.qos.logback" % "logback-classic" % Logback
-    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % ScalaLogging % "provided"
-    val scalaLoggingSlf4j = "com.typesafe.scala-logging" %% "scala-logging-slf4j" %  ScalaLoggingSlf4j
+    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % ScalaLogging
+    val scalaLoggingSlf4j = "com.typesafe.scala-logging" %% "scala-logging-slf4j" %  ScalaLoggingSlf4j % "provided"
     val scalaConfig = "com.typesafe" % "config" % ScalaConfig
     val jodaTime = "joda-time" % "joda-time" % JodaTime
     val sparkCassandraConnector = "com.datastax.spark" %% "spark-cassandra-connector" % SparkCassandra % "provided"

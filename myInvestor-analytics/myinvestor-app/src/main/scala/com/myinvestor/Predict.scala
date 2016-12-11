@@ -5,16 +5,15 @@ import com.myinvestor.analytics.CCICorrection
 import com.myinvestor.common.Settings
 import com.myinvestor.model.CassandraModel.{Stock, StockHistory}
 import com.myinvestor.model.CassandraSchema
-import com.typesafe.scalalogging.Logger
 import org.apache.spark.{SparkConf, SparkContext}
-
+import com.typesafe.scalalogging.Logger
 /**
   * Perform prediction.
   */
 object Predict {
 
   def main(args: Array[String]) {
-    /*
+
     val logger = Logger("Predict")
     val settings = new Settings()
 
@@ -39,7 +38,6 @@ object Predict {
 
     prediction.apply(stock, stockHistoryRdd)
 
-    */
     /*
     stocks.foreach { stock =>
       // Get the stock history for this stock
