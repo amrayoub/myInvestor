@@ -37,7 +37,7 @@ lazy val app = (project in file("./myinvestor-app")).
     name := "app",
     libraryDependencies ++= Dependencies.app,
     assemblyJarName in assembly := "myinvestor-app.jar"
-    // mainClass in assembly := Some("com.example.Main")
+    // mainClass in assembly := Some("com.myinvestor.XX")
   ).dependsOn(core)
 
 
@@ -47,7 +47,7 @@ lazy val client = (project.dependsOn(core) in file("./myinvestor-client")).
     name := "client",
     libraryDependencies ++= Dependencies.client,
     assemblyJarName in assembly := "myinvestor-client.jar"
-    // mainClass in assembly := Some("com.example.Main")
+    // mainClass in assembly := Some("com.myinvestor.XX")
   ).dependsOn(core)
 
 lazy val example = (project in file("./myinvestor-example")).
@@ -56,7 +56,7 @@ lazy val example = (project in file("./myinvestor-example")).
     name := "example",
     libraryDependencies ++= Dependencies.example,
     assemblyJarName in assembly := "myinvestor-example.jar"
-    // mainClass in assembly := Some("com.example.Main")
+    // mainClass in assembly := Some("com.myinvestor.XX")
   ).dependsOn(core)
   
 libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
