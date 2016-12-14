@@ -1,6 +1,6 @@
 package com.myinvestor
 
-import akka.actor.{ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
+import akka.actor.{ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
 
 /**
   * Main application to start Kafka, ZooKeeper, Akka.
@@ -8,6 +8,13 @@ import akka.actor.{ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvi
   * Can be run with sbt: sbt app/run
   */
 object MyInvestorApp extends App {
+  val settings = new MyInvestorSettings
+  import settings._
+
+  // Create the Actor system
+  val system = ActorSystem(AppName)
+  val myInvestor = MyInvestor(system)
+
 }
 
 
