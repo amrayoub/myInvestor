@@ -5,4 +5,9 @@ package com.myinvestor
   */
 object Trading {
 
+  // Base marker trait.
+  @SerialVersionUID(1L)
+  sealed trait TradingModel extends Serializable
+
+
 }
