@@ -52,7 +52,7 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   val SparkStreamingBatchInterval = withFallback[Int](Try(spark.getInt("streaming.batch.interval")), "spark.streaming.batch.interval") getOrElse 1000
 
-  val SparkCheckpointDir = killrweather.getString("spark.checkpoint.dir")
+  val SparkCheckpointDir = myInvestor.getString("spark.checkpoint.dir")
 
 
   // Cassandra settings
@@ -112,8 +112,7 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
       case "auto" => None
       case NumberPattern(x) => Some(x.toInt)
       case other =>
-        throw new IllegalArgumentException(
-          s"Invalid value for 'cassandra.output.batch.size.rows': $other. Number or 'auto' expected")
+        throw new IllegalArgumentException(s"Invalid value for 'cassandra.output.batch.size.rows': $other. Number or 'auto' expected")
     }
   }
 
@@ -121,9 +120,13 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   val CassandraDefaultMeasuredInsertsCount: Int = 128
 
-
   // Kakfa settings
-
+  val KafkaGroupId = kafka.getString("group.id")
+  val KafkaTopicRaw = kafka.getString("topic.raw")
+  val KafkaEncoderFqcn = kafka.getString("encoder.fqcn")
+  val KafkaDecoderFqcn = kafka.getString("decoder.fqcn")
+  val KafkaPartitioner = kafka.getString("partitioner.fqcn")
+  val KafkaBatchSendSize = kafka.getInt("batch.send.size")
 
   // Application settings
   val AppName = myInvestor.getString("app-name")

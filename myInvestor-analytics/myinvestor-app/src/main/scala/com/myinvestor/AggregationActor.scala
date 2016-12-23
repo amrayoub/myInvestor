@@ -1,11 +1,14 @@
+package com.myinvestor
+
 import java.util.concurrent.TimeoutException
 
-import scala.concurrent.duration._
 import akka.actor.SupervisorStrategy._
 import akka.actor._
 import akka.util.Timeout
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
+
+import scala.concurrent.duration._
 
 /**
   * Base actor for data computation.

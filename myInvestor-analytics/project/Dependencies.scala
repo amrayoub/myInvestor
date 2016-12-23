@@ -19,6 +19,7 @@ object Dependencies {
     val sparkCore = "org.apache.spark" %% "spark-core" % Spark % "provided"
     val sparkSql = "org.apache.spark" %% "spark-sql" % Spark % "provided"
     val sparkStreaming = "org.apache.spark" %% "spark-streaming" % Spark % "provided"
+    val sparkStreamingKafka = "org.apache.spark" %% "spark-streaming-kafka-0-10" % Spark % "provided"
     val sparkGraphx = "org.apache.spark" %% "spark-graphx" % Spark % "provided"
     val akkaActor = "com.typesafe.akka" %% "akka-actor" % Akka
     val akkaAgent = "com.typesafe.akka" %% "akka-agent" % Akka
@@ -28,13 +29,13 @@ object Dependencies {
     val akkaStream = "com.typesafe.akka" %% "akka-stream" % Akka
     val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % AkkaHttp
     val akkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttp
-    val kakfka = "org.apache.kafka" % "kafka" % Kafka
-
+    val kafka = "org.apache.kafka" %% "kafka" % Kafka
+    val kafkaStream = "org.apache.kafka" % "kafka-streams" % Kafka
   }
 
   import Library._
 
-  val spark = Seq(sparkCassandraConnector, sparkCore, sparkSql, sparkStreaming, sparkGraphx)
+  val spark = Seq(sparkCassandraConnector, sparkCore, sparkSql, sparkStreaming, sparkStreamingKafka, sparkGraphx)
 
   val logging = Seq(logback, scalaLogging, scalaLoggingSlf4j)
 
@@ -47,11 +48,11 @@ object Dependencies {
   val akka = Seq(akkaActor, akkaAgent, akkaCluster, akkaClusterMetrics, akkaSlf4j, akkaStream, akkaHttp, akkaHttpCore)
 
   // Module dependencies
-  val core = time ++ config ++ logging
+  val core = time ++ config ++ logging ++ akka
 
   val client = spark ++ ta
 
-  val app = spark ++ ta ++ akka ++ kafka
+  val app = spark ++ ta ++ akka ++ Seq(kafka, kafkaStream)
 
   val example = spark ++ ta
 

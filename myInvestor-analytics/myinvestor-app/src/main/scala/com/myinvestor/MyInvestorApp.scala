@@ -7,7 +7,7 @@ import akka.cluster.Cluster
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 /**
   * Main application to start Kafka, ZooKeeper, Akka.
@@ -44,21 +44,20 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
 
   implicit private val timeout = system.settings.CreationTimeout
 
-  /** Configures Spark. */
+  // Configures Spark
   protected val conf = new SparkConf().setAppName(getClass.getSimpleName)
-    .setMaster(SparkMaster)
-    .set("spark.cassandra.connection.host", CassandraHosts)
-    .set("spark.cleaner.ttl", SparkCleanerTtl.toString)
+                        .setMaster(SparkMaster)
+                        .set("spark.cassandra.connection.host", CassandraHosts)
+                        .set("spark.cleaner.ttl", SparkCleanerTtl.toString)
 
-  /** Creates the Spark Streaming context. */
+  // Creates the Spark Streaming context.
   protected val ssc = new StreamingContext(conf, Milliseconds(SparkStreamingBatchInterval))
 
-  /* The root supervisor and traffic controller of the app. All inbound messages go through this actor. */
+  // The root supervisor and traffic controller of the app. All inbound messages go through this actor
   private val guardian = system.actorOf(Props(new NodeGuardian(ssc, kafka, settings)), "node-guardian")
 
   private val cluster = Cluster(system)
 
-  //val selfAddress: Address = cluster.selfAddress
   val selfAddress: Address = cluster.selfAddress
 
   cluster.joinSeedNodes(Vector(selfAddress))
@@ -76,7 +75,7 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
       (guardian ? GracefulShutdown).mapTo[Future[Boolean]]
         .onComplete { _ =>
           system.terminate()
-          system.result(system.whenTerminated, timeout.duration)
+          Await.ready(system.whenTerminated, timeout.duration)
         }
     }
   }
