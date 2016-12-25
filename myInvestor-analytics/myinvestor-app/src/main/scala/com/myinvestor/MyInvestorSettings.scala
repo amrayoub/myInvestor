@@ -1,6 +1,7 @@
 package com.myinvestor
 
 import java.net.InetAddress
+import java.util.List
 
 import com.datastax.driver.core.ConsistencyLevel
 import com.datastax.spark.connector.cql.{AuthConf, NoAuthConf, PasswordAuthConf}
@@ -90,13 +91,13 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
   val CassandraConnectionReconnectDelayMax = withFallback[Int](Try(cassandra.getInt("reconnect-delay.max")), "spark.cassandra.connection.reconnection_delay_ms.max") getOrElse 60000
 
   // Reads
-  val CassandraReadPageRowSize = withFallback[Int](Try(cassandra.getInt("read.page.row.size")), "spark.cassandra.input.page.row.size") getOrElse 1000
+  val CassandraReadPageRowSize: Integer = withFallback[Int](Try(cassandra.getInt("read.page.row.size")), "spark.cassandra.input.page.row.size") getOrElse 1000
 
   val CassandraReadConsistencyLevel: ConsistencyLevel = ConsistencyLevel.valueOf(
     withFallback[String](Try(cassandra.getString("read.consistency.level")),
       "spark.cassandra.input.consistency.level") getOrElse ConsistencyLevel.LOCAL_ONE.name)
 
-  val CassandraReadSplitSize = withFallback[Long](Try(cassandra.getLong("read.split.size")), "spark.cassandra.input.split.size") getOrElse 100000
+  val CassandraReadSplitSize: Long = withFallback[Long](Try(cassandra.getLong("read.split.size")), "spark.cassandra.input.split.size") getOrElse 100000
 
   // Writes
 
@@ -121,16 +122,15 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
   val CassandraDefaultMeasuredInsertsCount: Int = 128
 
   // Kakfa settings
-  val KafkaGroupId = kafka.getString("group.id")
-  val KafkaTopicRaw = kafka.getString("topic.raw")
-  val KafkaEncoderFqcn = kafka.getString("encoder.fqcn")
-  val KafkaDecoderFqcn = kafka.getString("decoder.fqcn")
-  val KafkaPartitioner = kafka.getString("partitioner.fqcn")
-  val KafkaBatchSendSize = kafka.getInt("batch.send.size")
+  val KafkaGroupId: String = kafka.getString("group.id")
+  val KafkaTopicRaw = kafka.getStringList("topic.raw")
+  val KafkaEncoderFqcn: String = kafka.getString("encoder.fqcn")
+  val KafkaDecoderFqcn: String = kafka.getString("decoder.fqcn")
+  val KafkaPartitioner: String = kafka.getString("partitioner.fqcn")
+  val KafkaBatchSendSize: Integer = kafka.getInt("batch.send.size")
 
   // Application settings
-  val AppName = myInvestor.getString("app-name")
-
+  val AppName: String = myInvestor.getString("app-name")
 
   /**
     * Attempts to acquire from environment, then java system properties.

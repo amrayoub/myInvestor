@@ -2,17 +2,18 @@ package com.myinvestor
 
 import akka.actor.{Actor, Props}
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
+import com.myinvestor.Trading._
 import org.apache.spark.streaming.StreamingContext
-import org.apache.spark.streaming.kafka.KafkaInputDStream
+import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
 
-/** A `NodeGuardian` manages the worker actors at the root of each MyInvestor
+/** A 'NodeGuardian' manages the worker actors at the root of each MyInvestor
   * deployed application, where any special application logic is handled in the
   * implementer here, but the cluster work, node lifecycle and supervision events
   * are handled in [[ClusterAwareNodeGuardian]], in 'myinvestor/myinvestor-core.
   *
-  * This `NodeGuardian` creates the [[KafkaStreamingActor]] which creates a streaming
+  * This 'NodeGuardian' creates the [[KafkaStreamingActor]] which creates a streaming
   * pipeline from Kafka to Cassandra, via Spark, which streams the raw data from Kafka,
-  * transforms data to [[com.myinvestor.Trading.RawTradingData]],
+  * transforms data to [[RawTradingData]],
   * and saves the new data to the cassandra raw data table on arrival.
   */
 class NodeGuardian(ssc: StreamingContext, kafkaConfig: Map[String, String], settings: MyInvestorSettings) extends ClusterAwareNodeGuardian with AggregationActor {
@@ -34,11 +35,11 @@ class NodeGuardian(ssc: StreamingContext, kafkaConfig: Map[String, String], sett
   }
 
   /** When [[OutputStreamInitialized]] is received in the parent actor, [[ClusterAwareNodeGuardian]],
-    * from the [[KafkaStreamingActor]] after it creates and defines the [[KafkaInputDStream]],
+    * from the [[KafkaStreamingActor]] after it creates and defines the [[DirectKafkaInputDStream]],
     * the Spark Streaming checkpoint can be set, the [[StreamingContext]] can be started, and the
     * node guardian actor moves from [[uninitialized]] to [[initialized]]with [[akka.actor.ActorContext.become()]].
     *
-    * @see [[com.myinvestor.cluster.ClusterAwareNodeGuardian]]
+    * @see [[ClusterAwareNodeGuardian]]
     */
   override def initialize(): Unit = {
     // super.initialize()
@@ -56,6 +57,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaConfig: Map[String, String], sett
     case e: WeatherStationRequest => station forward e
     */
     // case GracefulShutdown => gracefulShutdown(sender())
+    // TODO
     return null
   }
 
