@@ -2,9 +2,9 @@ package com.myinvestor
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import org.apache.spark.streaming.StreamingContext
-import org.apache.spark.streaming.kafka010.KafkaUtils
-import org.apache.spark.streaming.kafka010.ConsumerStrategies._
+import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
+import org.apache.spark.streaming.kafka010._
 
 
 /**
@@ -21,9 +21,9 @@ class KafkaStreamingActor(kafkaParams: Map[String, Object],
   import settings._
 
   // TODO
-
-  val stream = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](KafkaTopicRaw, kafkaParams)
-  )
+  val topics = Array(KafkaTopicSource)
+  val stream = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
+  println("initialized stream")
 
   def receive: Actor.Receive = {
     case e => // ignore

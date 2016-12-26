@@ -15,7 +15,7 @@ object Trading {
   object RawTradingData {
     // TODO
     def apply(array: Array[String]): RawTradingData = {
-      RawTradingData
+      return RawTradingData()
     }
   }
 

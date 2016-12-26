@@ -22,7 +22,7 @@ object Versions {
   val Kafka = "0.10.1.0"
   val JodaTime = "2.9.6"
   val Logback = "1.1.7"
-  val Spark = "2.0.2"
+  val Spark = "2.1.0"
   val SparkCassandra = "2.0.0-M3"
   val ScalaLogging = "3.5.0"
   val ScalaLoggingSlf4j = "2.1.2"

@@ -30,17 +30,19 @@ object MyInvestor extends ExtensionId[MyInvestor] with ExtensionIdProvider {
 
 class MyInvestor(system: ExtendedActorSystem) extends Extension {
 
+  val settings = new MyInvestorSettings
+  import settings._
+
   import TradingEvent.GracefulShutdown
   import system.dispatcher
+
+  val nodeGuardianActorName = "node-guardian"
 
   system.registerOnTermination(shutdown())
 
   protected val log = akka.event.Logging(system, system.name)
   protected val running = new AtomicBoolean(false)
   protected val terminated = new AtomicBoolean(false)
-
-  val settings = new MyInvestorSettings
-  import settings._
 
   implicit private val timeout = system.settings.CreationTimeout
 
@@ -53,8 +55,17 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
   // Creates the Spark Streaming context.
   protected val ssc = new StreamingContext(conf, Milliseconds(SparkStreamingBatchInterval))
 
+  // Configure Kafka
+  val kafkaParams: Map[String, Object] = Map[String, Object](
+    "bootstrap.servers" -> KafkaHosts,
+    "key.deserializer" -> Class.forName(KafkaDeserializerFqcn),
+    "value.deserializer" -> Class.forName(KafkaDeserializerFqcn),
+    "group.id" -> KafkaGroupId,
+    "auto.offset.reset" -> KafkaAutoOffsetReset,
+    "enable.auto.commit" -> (KafkaEnableAutoCommit: java.lang.Boolean)
+  )
   // The root supervisor and traffic controller of the app. All inbound messages go through this actor
-  private val guardian = system.actorOf(Props(new NodeGuardian(ssc, kafka, settings)), "node-guardian")
+  private val guardian = system.actorOf(Props(new NodeGuardian(ssc, kafkaParams, settings)), nodeGuardianActorName)
 
   private val cluster = Cluster(system)
 

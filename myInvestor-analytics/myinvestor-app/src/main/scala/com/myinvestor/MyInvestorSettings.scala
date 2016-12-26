@@ -1,7 +1,6 @@
 package com.myinvestor
 
 import java.net.InetAddress
-import java.util.List
 
 import com.datastax.driver.core.ConsistencyLevel
 import com.datastax.spark.connector.cql.{AuthConf, NoAuthConf, PasswordAuthConf}
@@ -32,33 +31,33 @@ import scala.util.Try
   */
 final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable {
 
-  val localAddress = InetAddress.getLocalHost.getHostAddress
+  val localAddress: String = InetAddress.getLocalHost.getHostAddress
 
-  val rootConfig = conf match {
+  val rootConfig: Config = conf match {
     case Some(c) => c.withFallback(ConfigFactory.load())
     case _ => ConfigFactory.load
   }
 
-  protected val spark = rootConfig.getConfig("spark")
-  protected val cassandra = rootConfig.getConfig("cassandra")
-  protected val kafka = ConfigFactory.load.getConfig("kafka")
-  protected val myInvestor = rootConfig.getConfig("myInvestor")
+  protected val spark: Config = rootConfig.getConfig("spark")
+  protected val cassandra: Config = rootConfig.getConfig("cassandra")
+  protected val kafka: Config = ConfigFactory.load.getConfig("kafka")
+  protected val myInvestor: Config = rootConfig.getConfig("myInvestor")
 
 
   // Spark settings
 
-  val SparkMaster = withFallback[String](Try(spark.getString("master")), "spark.master") getOrElse "local[*]"
+  val SparkMaster: String = withFallback[String](Try(spark.getString("master")), "spark.master") getOrElse "local[*]"
 
-  val SparkCleanerTtl = withFallback[Int](Try(spark.getInt("cleaner.ttl")), "spark.cleaner.ttl") getOrElse (3600 * 2)
+  val SparkCleanerTtl: Int =  withFallback[Int](Try(spark.getInt("cleaner.ttl")), "spark.cleaner.ttl") getOrElse (3600 * 2)
 
-  val SparkStreamingBatchInterval = withFallback[Int](Try(spark.getInt("streaming.batch.interval")), "spark.streaming.batch.interval") getOrElse 1000
+  val SparkStreamingBatchInterval: Long = withFallback[Long](Try(spark.getInt("streaming.batch.interval")), "spark.streaming.batch.interval") getOrElse 1000
 
-  val SparkCheckpointDir = myInvestor.getString("spark.checkpoint.dir")
+  val SparkCheckpointDir: String = myInvestor.getString("spark.checkpoint.dir")
 
 
   // Cassandra settings
 
-  val CassandraHosts = withFallback[String](Try(cassandra.getString("connection.host")), "spark.cassandra.connection.host") getOrElse localAddress
+  val CassandraHosts: String = withFallback[String](Try(cassandra.getString("connection.host")), "spark.cassandra.connection.host") getOrElse localAddress
 
   val CassandraAuthUsername: Option[String] = Try(cassandra.getString("auth.username")).toOption.orElse(sys.props.get("spark.cassandra.auth.username"))
 
@@ -76,22 +75,22 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
     }
   }
 
-  val CassandraRpcPort = withFallback[Int](Try(cassandra.getInt("connection.rpc.port")), "spark.cassandra.connection.rpc.port") getOrElse 9160
+  val CassandraRpcPort: Int = withFallback[Int](Try(cassandra.getInt("connection.rpc.port")), "spark.cassandra.connection.rpc.port") getOrElse 9160
 
-  val CassandraNativePort = withFallback[Int](Try(cassandra.getInt("connection.native.port")), "spark.cassandra.connection.native.port") getOrElse 9042
+  val CassandraNativePort: Int = withFallback[Int](Try(cassandra.getInt("connection.native.port")), "spark.cassandra.connection.native.port") getOrElse 9042
 
   // Tuning
 
-  val CassandraKeepAlive = withFallback[Int](Try(cassandra.getInt("connection.keep-alive")), "spark.cassandra.connection.keep_alive_ms") getOrElse 1000
+  val CassandraKeepAlive: Int = withFallback[Int](Try(cassandra.getInt("connection.keep-alive")), "spark.cassandra.connection.keep_alive_ms") getOrElse 1000
 
-  val CassandraRetryCount = withFallback[Int](Try(cassandra.getInt("connection.query.retry-count")), "spark.cassandra.query.retry.count") getOrElse 10
+  val CassandraRetryCount: Int = withFallback[Int](Try(cassandra.getInt("connection.query.retry-count")), "spark.cassandra.query.retry.count") getOrElse 10
 
-  val CassandraConnectionReconnectDelayMin = withFallback[Int](Try(cassandra.getInt("connection.reconnect-delay.min")), "spark.cassandra.connection.reconnection_delay_ms.min") getOrElse 1000
+  val CassandraConnectionReconnectDelayMin: Int = withFallback[Int](Try(cassandra.getInt("connection.reconnect-delay.min")), "spark.cassandra.connection.reconnection_delay_ms.min") getOrElse 1000
 
-  val CassandraConnectionReconnectDelayMax = withFallback[Int](Try(cassandra.getInt("reconnect-delay.max")), "spark.cassandra.connection.reconnection_delay_ms.max") getOrElse 60000
+  val CassandraConnectionReconnectDelayMax: Int = withFallback[Int](Try(cassandra.getInt("reconnect-delay.max")), "spark.cassandra.connection.reconnection_delay_ms.max") getOrElse 60000
 
   // Reads
-  val CassandraReadPageRowSize: Integer = withFallback[Int](Try(cassandra.getInt("read.page.row.size")), "spark.cassandra.input.page.row.size") getOrElse 1000
+  val CassandraReadPageRowSize: Int = withFallback[Int](Try(cassandra.getInt("read.page.row.size")), "spark.cassandra.input.page.row.size") getOrElse 1000
 
   val CassandraReadConsistencyLevel: ConsistencyLevel = ConsistencyLevel.valueOf(
     withFallback[String](Try(cassandra.getString("read.consistency.level")),
@@ -101,11 +100,11 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   // Writes
 
-  val CassandraWriteParallelismLevel = withFallback[Int](Try(cassandra.getInt("write.concurrent.writes")), "spark.cassandra.output.concurrent.writes") getOrElse 5
+  val CassandraWriteParallelismLevel: Int = withFallback[Int](Try(cassandra.getInt("write.concurrent.writes")), "spark.cassandra.output.concurrent.writes") getOrElse 5
 
-  val CassandraWriteBatchSizeBytes = withFallback[Int](Try(cassandra.getInt("write.batch.size.bytes")), "spark.cassandra.output.batch.size.bytes") getOrElse 64 * 1024
+  val CassandraWriteBatchSizeBytes: Int = withFallback[Int](Try(cassandra.getInt("write.batch.size.bytes")), "spark.cassandra.output.batch.size.bytes") getOrElse 64 * 1024
 
-  private val CassandraWriteBatchSizeRows = withFallback[String](Try(cassandra.getString("write.batch.size.rows")), "spark.cassandra.output.batch.size.rows") getOrElse "auto"
+  private val CassandraWriteBatchSizeRows: String = withFallback[String](Try(cassandra.getString("write.batch.size.rows")), "spark.cassandra.output.batch.size.rows") getOrElse "auto"
 
   val CassandraWriteBatchRowSize: Option[Int] = {
     val NumberPattern = "([0-9]+)".r
@@ -122,12 +121,12 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
   val CassandraDefaultMeasuredInsertsCount: Int = 128
 
   // Kakfa settings
+  val KafkaHosts: String = withFallback[String](Try(kafka.getString("hosts")), "kafka.hosts") getOrElse "localhost:9092"
   val KafkaGroupId: String = kafka.getString("group.id")
-  val KafkaTopicRaw = kafka.getStringList("topic.raw")
-  val KafkaEncoderFqcn: String = kafka.getString("encoder.fqcn")
-  val KafkaDecoderFqcn: String = kafka.getString("decoder.fqcn")
-  val KafkaPartitioner: String = kafka.getString("partitioner.fqcn")
-  val KafkaBatchSendSize: Integer = kafka.getInt("batch.send.size")
+  val KafkaTopicSource: String = kafka.getString("topic.source")
+  val KafkaDeserializerFqcn: String = kafka.getString("deserializer.fqcn")
+  val KafkaAutoOffsetReset: String = kafka.getString("auto-offset-reset")
+  val KafkaEnableAutoCommit: Boolean = kafka.getBoolean("enable.auto.commit")
 
   // Application settings
   val AppName: String = myInvestor.getString("app-name")
