@@ -58,6 +58,6 @@ lazy val example = (project in file("./myinvestor-example")).
     assemblyJarName in assembly := "myinvestor-example.jar"
     // mainClass in assembly := Some("com.myinvestor.XX")
   ).dependsOn(core)
-  
+
 libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
 

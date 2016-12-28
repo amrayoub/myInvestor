@@ -23,7 +23,6 @@ class KafkaStreamingActor(kafkaParams: Map[String, Object],
   // TODO
   val topics = Array(KafkaTopicSource)
   val stream = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
-  println("initialized stream")
 
   def receive: Actor.Receive = {
     case e => // ignore

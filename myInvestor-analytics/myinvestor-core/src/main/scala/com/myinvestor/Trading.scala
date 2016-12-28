@@ -7,15 +7,17 @@ object Trading {
 
   // Base marker trait.
   @SerialVersionUID(1L)
-  sealed trait TradingModel extends Serializable
+  sealed trait TradeModel extends Serializable
 
   // TODO
-  case class RawTradingData() extends TradingModel
+  case class StockHistory(symbol: String) extends TradeModel
 
-  object RawTradingData {
-    // TODO
-    def apply(array: Array[String]): RawTradingData = {
-      return RawTradingData()
+  object StockHistory {
+    // TODO use a JSON object
+    def apply(array: Array[String]): StockHistory = {
+      StockHistory(
+        symbol = array(0)
+      )
     }
   }
 

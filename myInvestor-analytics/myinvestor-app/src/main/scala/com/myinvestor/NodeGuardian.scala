@@ -1,8 +1,8 @@
 package com.myinvestor
 
-import akka.actor.{Actor, Props}
-import com.myinvestor.cluster.ClusterAwareNodeGuardian
+import akka.actor.{Actor, ActorRef, Props}
 import com.myinvestor.Trading._
+import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
 
@@ -28,9 +28,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
   context.actorOf(Props(new KafkaStreamingActor(kafkaParams, ssc, settings, self)), KafkaActorName)
 
   // The Spark/Cassandra computation actors: For the tutorial we just use 2005 for now.
-  //val temperature = context.actorOf(Props(new TemperatureActor(ssc.sparkContext, settings)), "temperature")
-  //val precipitation = context.actorOf(Props(new PrecipitationActor(ssc, settings)), "precipitation")
-  //val station = context.actorOf(Props(new WeatherStationActor(ssc.sparkContext, settings)), "weather-station")
+  val stockAggregator: ActorRef = context.actorOf(Props(new StockAggregatorActor(ssc, settings)), "stock-aggregator")
 
   override def preStart(): Unit = {
     super.preStart()
@@ -45,7 +43,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
     * @see [[ClusterAwareNodeGuardian]]
     */
   override def initialize(): Unit = {
-    // super.initialize()
+    super.initialize()
     ssc.checkpoint(SparkCheckpointDir)
     ssc.start() // currently can not add more dstreams once started
 
@@ -54,10 +52,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
 
   // This node guardian's customer behavior once initialized.
   def initialized: Actor.Receive = {
-
-    case e: TemperatureRequest => temperature forward e
-    case e: PrecipitationRequest => precipitation forward e
-    case e: WeatherStationRequest => station forward e
+    case e: StockRequest => stockAggregator forward e
     case GracefulShutdown => gracefulShutdown(sender())
   }
 

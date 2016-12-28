@@ -48,7 +48,7 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   val SparkMaster: String = withFallback[String](Try(spark.getString("master")), "spark.master") getOrElse "local[*]"
 
-  val SparkCleanerTtl: Int =  withFallback[Int](Try(spark.getInt("cleaner.ttl")), "spark.cleaner.ttl") getOrElse (3600 * 2)
+  val SparkCleanerTtl: Int = withFallback[Int](Try(spark.getInt("cleaner.ttl")), "spark.cleaner.ttl") getOrElse (3600 * 2)
 
   val SparkStreamingBatchInterval: Long = withFallback[Long](Try(spark.getInt("streaming.batch.interval")), "spark.streaming.batch.interval") getOrElse 1000
 
@@ -130,13 +130,15 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   // Application settings
   val AppName: String = myInvestor.getString("app-name")
+  val CassandraKeyspace: String = myInvestor.getString("cassandra.keyspace")
+  val CassandraTableSource: String = myInvestor.getString("cassandra.table.source")
 
   /**
     * Attempts to acquire from environment, then java system properties.
     *
-    * @param env
-    * @param key
-    * @tparam T
+    * @param env Emvironment
+    * @param key Key
+    * @tparam T Value
     * @return
     */
   def withFallback[T](env: Try[T], key: String): Option[T] = env match {
