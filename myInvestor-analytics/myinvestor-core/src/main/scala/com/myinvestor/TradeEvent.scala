@@ -31,6 +31,7 @@ object TradingEvent {
 
   case class GetStockHistory(symbol: String) extends StockRequest
 
+  trait TechnicalAnalysisRequest extends TradingRequest
 
   sealed trait Task extends Serializable
 
