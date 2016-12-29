@@ -3,12 +3,12 @@ package com.myinvestor
 /**
   * Trading events.
   */
-object TradingEvent {
+object TradeEvent {
 
   @SerialVersionUID(1L)
-  sealed trait TradingEvent extends Serializable
+  sealed trait TradeEvent extends Serializable
 
-  sealed trait LifeCycleEvent extends TradingEvent
+  sealed trait LifeCycleEvent extends TradeEvent
 
   case object OutputStreamInitialized extends LifeCycleEvent
 
@@ -24,14 +24,14 @@ object TradingEvent {
 
 
   // TODO
-  sealed trait TradingRequest extends TradingEvent
+  sealed trait TradeRequest extends TradeEvent
 
   // Stock summary and aggregation
-  trait StockRequest extends TradingRequest
+  trait StockRequest extends TradeRequest
 
   case class GetStockHistory(symbol: String) extends StockRequest
 
-  trait TechnicalAnalysisRequest extends TradingRequest
+  trait TechnicalAnalysisRequest extends TradeRequest
 
   sealed trait Task extends Serializable
 

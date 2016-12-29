@@ -8,7 +8,7 @@ import akka.cluster.metrics.{ClusterMetricsChanged, Metric}
 import akka.cluster.{Cluster, Member}
 import akka.pattern._
 import akka.util.Timeout
-import com.myinvestor.TradingEvent
+import com.myinvestor.TradeEvent
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -66,7 +66,7 @@ abstract class ClusterAware extends Actor with ActorLogging {
 abstract class ClusterAwareNodeGuardian extends ClusterAware {
 
   import SupervisorStrategy._
-  import TradingEvent.{NodeInitialized, OutputStreamInitialized}
+  import TradeEvent.{NodeInitialized, OutputStreamInitialized}
   import akka.pattern.gracefulStop
   import context.dispatcher
 

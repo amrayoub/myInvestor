@@ -33,7 +33,7 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
   val settings = new MyInvestorSettings
   import settings._
 
-  import TradingEvent.GracefulShutdown
+  import TradeEvent.GracefulShutdown
   import system.dispatcher
 
   val nodeGuardianActorName = "node-guardian"

@@ -3,7 +3,7 @@ package com.myinvestor
 /**
   * Trading object.
   */
-object Trading {
+object Trade {
 
   // Base marker trait.
   @SerialVersionUID(1L)

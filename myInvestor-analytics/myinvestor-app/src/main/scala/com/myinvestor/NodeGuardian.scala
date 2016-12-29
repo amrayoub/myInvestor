@@ -1,7 +1,7 @@
 package com.myinvestor
 
 import akka.actor.{Actor, ActorRef, Props}
-import com.myinvestor.Trading._
+import com.myinvestor.Trade._
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
@@ -13,22 +13,22 @@ import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
   * are handled in [[ClusterAwareNodeGuardian]], in 'myinvestor/myinvestor-core.
   *
   * This 'NodeGuardian' creates the [[KafkaStreamingActor]] which creates a streaming
-  * pipeline from Kafka to Cassandra, via Spark, which streams the raw data from Kafka,
-  * transforms data to [[RawTradingData]],
-  * and saves the new data to the cassandra raw data table on arrival.
+  * pipeline from Kafka to Cassandra, via Spark, which streams and transform the source data from Kafka,
+  * and saves the new data to the cassandra data table on arrival.
   */
 class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], settings: MyInvestorSettings) extends ClusterAwareNodeGuardian with AggregationActor {
 
-  import TradingEvent._
+  import TradeEvent._
   import settings._
 
   val KafkaActorName = "kafka-stream"
 
-  // Creates the Kafka stream saving raw data and aggregated data to cassandra.
+  // Creates the Kafka stream saving data and aggregated data to cassandra.
   context.actorOf(Props(new KafkaStreamingActor(kafkaParams, ssc, settings, self)), KafkaActorName)
 
-  // The Spark/Cassandra computation actors: For the tutorial we just use 2005 for now.
+  // The Spark Cassandra computation actor
   val stockAggregator: ActorRef = context.actorOf(Props(new StockAggregatorActor(ssc, settings)), "stock-aggregator")
+  val technicalAnalysis: ActorRef = context.actorOf(Props(new TechnicalAnalysisActor(ssc.sparkContext, settings)), "technical-analysis")
 
   override def preStart(): Unit = {
     super.preStart()
@@ -53,6 +53,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
   // This node guardian's customer behavior once initialized.
   def initialized: Actor.Receive = {
     case e: StockRequest => stockAggregator forward e
+    case e: TechnicalAnalysisRequest => technicalAnalysis forward e
     case GracefulShutdown => gracefulShutdown(sender())
   }
 
