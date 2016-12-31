@@ -10,6 +10,7 @@ object Dependencies {
   implicit class Exclude(module: ModuleID) {
     def log4jExclude: ModuleID =
       module excludeAll (ExclusionRule("log4j"))
+
   }
 
   object Library {
@@ -55,7 +56,7 @@ object Dependencies {
   // Module dependencies
   val core = time ++ config ++ logging ++ akka
 
-  val client = spark ++ ta
+  val client = spark ++ ta ++ akka
 
   val app = spark ++ ta ++ akka ++ Seq(kafka, kafkaStream)
 

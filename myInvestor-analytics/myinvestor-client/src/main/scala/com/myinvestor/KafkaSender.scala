@@ -5,18 +5,18 @@ import java.util.Properties
 import akka.actor.{Actor, ActorLogging}
 import kafka.serializer.StringEncoder
 import kafka.server.KafkaConfig
-import org.apache.kafka.clients.producer.{Producer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{KafkaProducer, Producer, ProducerConfig, ProducerRecord}
 
 /**
   * Simple producer for an Akka Actor using string encoder and default partitioner.
   **/
-abstract class KafkaProducerActor[K, V] extends Actor with ActorLogging {
+abstract class KafkaSenderActor[K, V] extends Actor with ActorLogging {
 
   import KafkaEvent._
 
-  def producerConfig: ProducerConfig
+  def config: Properties
 
-  private val producer = new KafkaProducer[K, V](producerConfig)
+  private val producer = new KafkaSender[K, V](config)
 
   override def postStop(): Unit = {
     log.info("Shutting down producer.")
@@ -28,18 +28,18 @@ abstract class KafkaProducerActor[K, V] extends Actor with ActorLogging {
   }
 }
 
-/** Simple producer using string encoder and default partitioner. */
-class KafkaProducer[K, V](producerConfig: ProducerConfig) {
+// Simple producer using string encoder and default partitioner.
+class KafkaSender[K, V](config: Properties) {
 
-  def this(brokers: Set[String], batchSize: Int, producerType: String, serializerFqcn: String) =
-    this(KafkaProducer.createConfig(brokers, batchSize, producerType, serializerFqcn))
+  def this(brokers: Set[String], batchSize: Int, serializerFqcn: String) =
+    this(KafkaSender.createConfig(brokers, batchSize, serializerFqcn))
 
   def this(config: KafkaConfig) =
-    this(KafkaProducer.defaultConfig(config))
+    this(KafkaSender.defaultConfig(config))
 
   import KafkaEvent._
 
-  private val producer = new Producer[K, V](producerConfig)
+  private val producer = new KafkaProducer[K, V](config)
 
   /** Sends the data, partitioned by key to the topic. */
   def send(e: KafkaMessageEnvelope[K, V]): Unit =
@@ -50,8 +50,9 @@ class KafkaProducer[K, V](producerConfig: ProducerConfig) {
     batchSend(topic, key, Seq(message))
 
   def batchSend(topic: String, key: K, batch: Seq[V]): Unit = {
-    val messages = batch map (msg => new ProducerRecord[K, V](topic, key, msg))
-    producer.send(messages.toArray: _*)
+    for (message <- batch) {
+      producer.send(new ProducerRecord[K, V](topic, key, message))
+    }
   }
 
   def close(): Unit = producer.close()
@@ -59,24 +60,21 @@ class KafkaProducer[K, V](producerConfig: ProducerConfig) {
 }
 
 object KafkaEvent {
-
   case class KafkaMessageEnvelope[K, V](topic: String, key: K, messages: V*)
-
 }
 
-object KafkaProducer {
+object KafkaSender {
 
-  def createConfig(brokers: Set[String], batchSize: Int, producerType: String, serializerFqcn: String): ProducerConfig = {
+  def createConfig(brokers: Set[String], batchSize: Int, serializerFqcn: String): Properties = {
     val props = new Properties()
-    props.put("metadata.broker.list", brokers.mkString(","))
-    props.put("serializer.class", serializerFqcn)
-    props.put("partitioner.class", "kafka.producer.DefaultPartitioner")
-    props.put("producer.type", producerType)
-    props.put("request.required.acks", "1")
-    props.put("batch.num.messages", batchSize.toString)
-    new ProducerConfig(props)
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers.mkString(","))
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, serializerFqcn)
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, serializerFqcn)
+    props.put(ProducerConfig.ACKS_CONFIG, "1")
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize.toString)
+    props
   }
 
-  def defaultConfig(config: KafkaConfig): ProducerConfig =
-    createConfig(Set(s"${config.hostName}:${config.port}"), 100, "async", classOf[StringEncoder].getName)
+  def defaultConfig(config: KafkaConfig): Properties =
+    createConfig(Set(s"${config.hostName}:${config.port}"), 100, classOf[StringEncoder].getName)
 }

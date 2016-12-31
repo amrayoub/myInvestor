@@ -1,3 +1,5 @@
+libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
+
 lazy val appSettings = Seq(
   name := Versions.name, 
   organization := Versions.organization, 
@@ -59,5 +61,5 @@ lazy val example = (project in file("./myinvestor-example")).
     // mainClass in assembly := Some("com.myinvestor.XX")
   ).dependsOn(core)
 
-libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
+
 

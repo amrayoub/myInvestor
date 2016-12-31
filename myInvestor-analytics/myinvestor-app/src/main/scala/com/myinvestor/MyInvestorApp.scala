@@ -16,6 +16,7 @@ import scala.concurrent.{Await, Future}
   */
 object MyInvestorApp extends App {
   val settings = new MyInvestorSettings
+
   import settings._
 
   // Create the Actor system
@@ -25,12 +26,14 @@ object MyInvestorApp extends App {
 
 object MyInvestor extends ExtensionId[MyInvestor] with ExtensionIdProvider {
   override def lookup: ExtensionId[_ <: Extension] = MyInvestor
+
   override def createExtension(system: ExtendedActorSystem) = new MyInvestor(system)
 }
 
 class MyInvestor(system: ExtendedActorSystem) extends Extension {
 
   val settings = new MyInvestorSettings
+
   import settings._
 
   import TradeEvent.GracefulShutdown
@@ -47,10 +50,13 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
   implicit private val timeout = system.settings.CreationTimeout
 
   // Configures Spark
-  protected val conf = new SparkConf().setAppName(getClass.getSimpleName)
-                        .setMaster(SparkMaster)
-                        .set("spark.cassandra.connection.host", CassandraHosts)
-                        .set("spark.cleaner.ttl", SparkCleanerTtl.toString)
+  protected val conf = new SparkConf().setAppName(AppName)
+    .setMaster(SparkMaster)
+    .set("spark.cassandra.connection.host", CassandraHosts)
+    .set("spark.cleaner.ttl", SparkCleanerTtl.toString)
+    .set("spark.cassandra.auth.username", CassandraAuthUsername.toString)
+    .set("spark.cassandra.auth.password", CassandraAuthPassword.toString)
+
 
   // Creates the Spark Streaming context.
   protected val ssc = new StreamingContext(conf, Milliseconds(SparkStreamingBatchInterval))
@@ -74,6 +80,7 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
   cluster.joinSeedNodes(Vector(selfAddress))
 
   def isRunning: Boolean = running.get
+
   def isTerminated: Boolean = terminated.get
 
   private def shutdown(): Unit = if (!isTerminated) {
