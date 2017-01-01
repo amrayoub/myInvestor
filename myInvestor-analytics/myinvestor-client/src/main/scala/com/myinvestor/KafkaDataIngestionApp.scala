@@ -7,7 +7,7 @@ import akka.routing.BalancingPool
 import com.myinvestor.KafkaEvent.KafkaMessageEnvelope
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import com.typesafe.config.ConfigFactory
-import kafka.serializer.StringEncoder
+import org.apache.kafka.common.serialization.StringSerializer
 
 /**
   * Run with: sbt clients/run for automatic data file import to Kafka.
@@ -39,7 +39,7 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
   // which sends messages to idle or less busy routees to handle work.
   val router = context.actorOf(BalancingPool(5).props(Props(new KafkaPublisherActor(KafkaHosts, KafkaBatchSendSize))), "kafka-ingestion-router")
 
-  // Wait for this node's [[akka.cluster.MemberStatus]] to be
+  // Wait for this node's [[MemberStatus]] to be
   // [[MemberUp]] before starting work, which means
   // it's membership in the [[Cluster]] node ring has been gossipped, and we
   // can leverage the cluster's adaptive load balancing which will route data
@@ -52,11 +52,8 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
 
     log.info("Starting data ingestion on {}.", cluster.selfAddress)
 
-    // Handles initial data ingestion in Kafka for running as a demo.
-    //for (fs <- initialData; data <- fs.data) {
-    //  log.info("Sending {} to Kafka", data)
-    //  router ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, data)
-    //}
+    router ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, "client testing123")
+
   }
 
   def initialized: Actor.Receive = {
@@ -70,7 +67,7 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
   *
   */
 class KafkaPublisherActor(val config: Properties) extends KafkaSenderActor[String, String] {
-  def this(hosts: Set[String], batchSize: Int) = this(KafkaSender.createConfig(hosts, batchSize, classOf[StringEncoder].getName))
+  def this(hosts: Set[String], batchSize: Int) = this(KafkaSender.createConfig(hosts, batchSize, classOf[StringSerializer].getName))
 }
 
 class GoogleFinanceDataFeedActor(kafka: ActorRef) extends Actor with ActorLogging {
@@ -78,7 +75,7 @@ class GoogleFinanceDataFeedActor(kafka: ActorRef) extends Actor with ActorLoggin
   val settings = new ClientSettings
   import settings._
 
-  kafka ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, "client testing")
+
 
   def receive: Actor.Receive = {
     case e =>

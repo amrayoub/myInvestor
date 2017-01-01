@@ -3,9 +3,9 @@ package com.myinvestor
 import java.util.Properties
 
 import akka.actor.{Actor, ActorLogging}
-import kafka.serializer.StringEncoder
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.StringSerializer
 import kafka.server.KafkaConfig
-import org.apache.kafka.clients.producer.{KafkaProducer, Producer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 
 /**
   * Simple producer for an Akka Actor using string encoder and default partitioner.
@@ -76,5 +76,5 @@ object KafkaSender {
   }
 
   def defaultConfig(config: KafkaConfig): Properties =
-    createConfig(Set(s"${config.hostName}:${config.port}"), 100, classOf[StringEncoder].getName)
+    createConfig(Set(s"${config.hostName}:${config.port}"), 100, classOf[StringSerializer].getName)
 }

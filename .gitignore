@@ -81,3 +81,6 @@ test-output
 
 diagrams/*.graffle
 *.suml*
+.checkpoint*
+checkpoint*
+log-*
