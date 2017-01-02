@@ -1,7 +1,6 @@
 package com.myinvestor
 
-import akka.actor.{Actor, ActorRef, Props}
-import com.myinvestor.Trade._
+import akka.actor.{Actor, ActorContext, ActorRef, Props}
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
@@ -38,7 +37,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
   /** When [[OutputStreamInitialized]] is received in the parent actor, [[ClusterAwareNodeGuardian]],
     * from the [[KafkaStreamingActor]] after it creates and defines the [[DirectKafkaInputDStream]],
     * the Spark Streaming checkpoint can be set, the [[StreamingContext]] can be started, and the
-    * node guardian actor moves from [[uninitialized]] to [[initialized]]with [[akka.actor.ActorContext.become()]].
+    * node guardian actor moves from [[uninitialized]] to [[initialized]]with [[ActorContext.become()]].
     *
     * @see [[ClusterAwareNodeGuardian]]
     */

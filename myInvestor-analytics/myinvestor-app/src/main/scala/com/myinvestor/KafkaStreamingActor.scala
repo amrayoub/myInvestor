@@ -26,7 +26,7 @@ class KafkaStreamingActor(kafkaParams: Map[String, Object],
   val kafkaStream = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
 
   // For debugging
-  // kafkaStream.map(record=>(record.value().toString)).print
+  kafkaStream.map(record=>(record.value().toString)).print
 
   // Notifies the supervisor that the Spark Streams have been created and defined.
   // Now the [[StreamingContext]] can be started.

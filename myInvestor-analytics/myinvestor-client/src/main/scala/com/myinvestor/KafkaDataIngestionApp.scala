@@ -3,7 +3,10 @@ package com.myinvestor
 import java.util.Properties
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.{HttpEntity, _}
 import akka.routing.BalancingPool
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.myinvestor.KafkaEvent.KafkaMessageEnvelope
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import com.typesafe.config.ConfigFactory
@@ -31,6 +34,7 @@ object KafkaDataIngestionApp extends App {
   */
 final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
   val settings = new ClientSettings
+
   import settings._
 
   cluster.joinSeedNodes(Vector(cluster.selfAddress))
@@ -48,7 +52,7 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
   cluster registerOnMemberUp {
 
     // As http data is received, publishes to Kafka.
-    context.actorOf(BalancingPool(10).props(Props(new GoogleFinanceDataFeedActor(router))), "dynamic-data-feed")
+    context.actorOf(BalancingPool(10).props(Props(new HttpDataFeedActor(router))), "dynamic-data-feed")
 
     log.info("Starting data ingestion on {}.", cluster.selfAddress)
 
@@ -70,14 +74,42 @@ class KafkaPublisherActor(val config: Properties) extends KafkaSenderActor[Strin
   def this(hosts: Set[String], batchSize: Int) = this(KafkaSender.createConfig(hosts, batchSize, classOf[StringSerializer].getName))
 }
 
-class GoogleFinanceDataFeedActor(kafka: ActorRef) extends Actor with ActorLogging {
+class HttpDataFeedActor(kafka: ActorRef) extends Actor with ActorLogging {
   implicit val system = context.system
   val settings = new ClientSettings
+
   import settings._
 
+  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system)  )
+  implicit val executionContext = system.dispatcher
 
+  val requestHandler: HttpRequest => HttpResponse = {
+    case HttpRequest(HttpMethods.POST, Uri.Path("/trade/data"), headers, entity, _) =>
+      println("requesting coming in")
+      HttpResponse(200, entity = HttpEntity(ContentTypes.`text/html(UTF-8)`, s"POST is successful."))
+    case _: HttpRequest =>
+      HttpResponse(400, entity = "Unsupported request")
+  }
+
+  //val bindingFuture = Http(system).bindAndHandleSync(requestHandler, HttpHostName, HttpListenPort)
+  //println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+
+  //bindingFuture
+  //  .flatMap(_.unbind()) // trigger unbinding from the port
+  //  .onComplete(_ => system.terminate()) // and shutdown when done
+
+
+  Http(system)
+    .bind(interface = HttpHostName, port = HttpListenPort)
+    .map { case connection =>
+      log.info("Accepted new connection from " + connection.remoteAddress)
+      connection.handleWithSyncHandler(requestHandler)
+    }
 
   def receive: Actor.Receive = {
     case e =>
   }
 }
+
+
+

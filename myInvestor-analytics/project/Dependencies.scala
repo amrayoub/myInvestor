@@ -11,6 +11,11 @@ object Dependencies {
     def log4jExclude: ModuleID =
       module excludeAll (ExclusionRule("log4j"))
 
+    def sparkExclusions: ModuleID =
+      module.log4jExclude.exclude("com.google.guava", "guava")
+        .exclude("org.apache.spark", "spark-core")
+        .exclude("org.slf4j", "slf4j-log4j12")
+
   }
 
   object Library {
@@ -22,11 +27,11 @@ object Dependencies {
     val scalaConfig: ModuleID = "com.typesafe" % "config" % ScalaConfig
     val jodaTime: ModuleID = "joda-time" % "joda-time" % JodaTime % "compile;runtime"
     val sparkCassandraConnector: ModuleID = "com.datastax.spark" %% "spark-cassandra-connector" % SparkCassandra
-    val sparkCore: ModuleID = "org.apache.spark" %% "spark-core" % Spark
-    val sparkSql: ModuleID = "org.apache.spark" %% "spark-sql" % Spark
-    val sparkStreaming: ModuleID = "org.apache.spark" %% "spark-streaming" % Spark
-    val sparkStreamingKafka: ModuleID = "org.apache.spark" %% "spark-streaming-kafka-0-10" % Spark
-    val sparkGraphx: ModuleID = "org.apache.spark" %% "spark-graphx" % Spark
+    val sparkCore: ModuleID = "org.apache.spark" %% "spark-core" % Spark sparkExclusions
+    val sparkSql: ModuleID = "org.apache.spark" %% "spark-sql" % Spark sparkExclusions
+    val sparkStreaming: ModuleID = "org.apache.spark" %% "spark-streaming" % Spark sparkExclusions
+    val sparkStreamingKafka: ModuleID = "org.apache.spark" %% "spark-streaming-kafka-0-10" % Spark sparkExclusions
+    val sparkGraphx: ModuleID = "org.apache.spark" %% "spark-graphx" % Spark sparkExclusions
     val akkaActor: ModuleID = "com.typesafe.akka" %% "akka-actor" % Akka
     val akkaAgent: ModuleID = "com.typesafe.akka" %% "akka-agent" % Akka
     val akkaCluster: ModuleID = "com.typesafe.akka" %% "akka-cluster" % Akka

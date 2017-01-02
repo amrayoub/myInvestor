@@ -17,8 +17,8 @@ object Versions {
   val Scala = "2.11.8"
 
   // Library version
-  val Akka = "2.4.14"
-  val AkkaHttp = "10.0.0"
+  val Akka = "2.4.16"
+  val AkkaHttp = "10.0.1"
   val Kafka = "0.10.1.0"
   val JodaTime = "2.9.6"
   val Logback = "1.1.7"

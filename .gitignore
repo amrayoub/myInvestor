@@ -84,3 +84,5 @@ diagrams/*.graffle
 .checkpoint*
 checkpoint*
 log-*
+.temp*
+temp

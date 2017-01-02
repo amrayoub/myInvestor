@@ -18,7 +18,7 @@ final class ClientSettings (conf: Option[Config] = None) extends Serializable {
   }
 
   protected val akka: Config = rootConfig.getConfig("akka")
-  protected val kafka: Config = ConfigFactory.load.getConfig("kafka")
+  protected val kafka: Config = rootConfig.getConfig("kafka")
   protected val myInvestor: Config = rootConfig.getConfig("myInvestor")
 
 
@@ -26,5 +26,8 @@ final class ClientSettings (conf: Option[Config] = None) extends Serializable {
   val KafkaTopic: String = kafka.getString("topic.source")
   val KafkaKey: String = kafka.getString("group.id")
   val KafkaBatchSendSize: Int = kafka.getInt("batch.send.size")
+
+  val HttpHostName = myInvestor.getString("http.host")
+  val HttpListenPort = myInvestor.getInt("http.port")
 
 }

@@ -40,7 +40,7 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   protected val spark: Config = rootConfig.getConfig("spark")
   protected val cassandra: Config = rootConfig.getConfig("cassandra")
-  protected val kafka: Config = ConfigFactory.load.getConfig("kafka")
+  protected val kafka: Config = rootConfig.getConfig("kafka")
   protected val myInvestor: Config = rootConfig.getConfig("myInvestor")
 
 
