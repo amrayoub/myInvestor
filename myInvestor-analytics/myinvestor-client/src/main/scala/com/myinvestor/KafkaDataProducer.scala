@@ -16,7 +16,7 @@ abstract class KafkaSenderActor[K, V] extends Actor with ActorLogging {
 
   def config: Properties
 
-  private val producer = new KafkaSender[K, V](config)
+  private val producer = new KafkaDataProducer[K, V](config)
 
   override def postStop(): Unit = {
     log.info("Shutting down producer.")
@@ -29,13 +29,13 @@ abstract class KafkaSenderActor[K, V] extends Actor with ActorLogging {
 }
 
 // Simple producer using string encoder and default partitioner.
-class KafkaSender[K, V](config: Properties) {
+class KafkaDataProducer[K, V](config: Properties) {
 
   def this(brokers: Set[String], batchSize: Int, serializerFqcn: String) =
-    this(KafkaSender.createConfig(brokers, batchSize, serializerFqcn))
+    this(KafkaDataProducer.createConfig(brokers, batchSize, serializerFqcn))
 
   def this(config: KafkaConfig) =
-    this(KafkaSender.defaultConfig(config))
+    this(KafkaDataProducer.defaultConfig(config))
 
   import KafkaEvent._
 
@@ -63,7 +63,7 @@ object KafkaEvent {
   case class KafkaMessageEnvelope[K, V](topic: String, key: K, messages: V*)
 }
 
-object KafkaSender {
+object KafkaDataProducer {
 
   def createConfig(brokers: Set[String], batchSize: Int, serializerFqcn: String): Properties = {
     val props = new Properties()

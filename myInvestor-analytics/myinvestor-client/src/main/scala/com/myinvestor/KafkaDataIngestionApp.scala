@@ -2,15 +2,22 @@ package com.myinvestor
 
 import java.util.Properties
 
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props, Terminated}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, _}
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.routing.BalancingPool
+import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
+import akka.util.{ByteString, Timeout}
 import com.myinvestor.KafkaEvent.KafkaMessageEnvelope
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import com.typesafe.config.ConfigFactory
+import io.netty.handler.codec.http.HttpResponseStatus
 import org.apache.kafka.common.serialization.StringSerializer
+
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 /**
   * Run with: sbt clients/run for automatic data file import to Kafka.
@@ -33,6 +40,7 @@ object KafkaDataIngestionApp extends App {
   * Ingest data from web.
   */
 final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
+  val actorName = "kafka-ingestion-router"
   val settings = new ClientSettings
 
   import settings._
@@ -41,7 +49,7 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
 
   // The [[KafkaPublisherActor]] as a load-balancing pool router
   // which sends messages to idle or less busy routees to handle work.
-  val router = context.actorOf(BalancingPool(5).props(Props(new KafkaPublisherActor(KafkaHosts, KafkaBatchSendSize))), "kafka-ingestion-router")
+  val router = context.actorOf(BalancingPool(5).props(Props(new KafkaPublisherActor(KafkaHosts, KafkaBatchSendSize))), actorName)
 
   // Wait for this node's [[MemberStatus]] to be
   // [[MemberUp]] before starting work, which means
@@ -52,9 +60,9 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
   cluster registerOnMemberUp {
 
     // As http data is received, publishes to Kafka.
-    context.actorOf(BalancingPool(10).props(Props(new HttpDataFeedActor(router))), "dynamic-data-feed")
+    context.actorOf(BalancingPool(1).props(Props(new HttpDataFeedActor(router))), "dynamic-data-feed")
 
-    log.info("Starting data ingestion on {}.", cluster.selfAddress)
+    log.info("Started data ingestion on {}.", cluster.selfAddress)
 
     router ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, "client testing123")
 
@@ -71,42 +79,45 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
   *
   */
 class KafkaPublisherActor(val config: Properties) extends KafkaSenderActor[String, String] {
-  def this(hosts: Set[String], batchSize: Int) = this(KafkaSender.createConfig(hosts, batchSize, classOf[StringSerializer].getName))
+  def this(hosts: Set[String], batchSize: Int) = this(KafkaDataProducer.createConfig(hosts, batchSize, classOf[StringSerializer].getName))
 }
 
 class HttpDataFeedActor(kafka: ActorRef) extends Actor with ActorLogging {
   implicit val system = context.system
   val settings = new ClientSettings
-
   import settings._
 
-  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system)  )
+  context.watch(kafka)  // Watch for the termination
+
+  implicit val askTimeout: Timeout = 500.millis
+  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system))
   implicit val executionContext = system.dispatcher
 
   val requestHandler: HttpRequest => HttpResponse = {
+    case HttpRequest(HttpMethods.GET, Uri.Path("/"), _, _, _) =>
+      HttpResponse(HttpResponseStatus.OK.code, entity = HttpEntity(
+        ContentTypes.`text/html(UTF-8)`,
+        "<html><title>HTTP data feed actor</title><body>HTTP data feed actor</body></html>"))
     case HttpRequest(HttpMethods.POST, Uri.Path("/trade/data"), headers, entity, _) =>
-      println("requesting coming in")
-      HttpResponse(200, entity = HttpEntity(ContentTypes.`text/html(UTF-8)`, s"POST is successful."))
-    case _: HttpRequest =>
-      HttpResponse(400, entity = "Unsupported request")
+      // Receive the JSON source trade data
+      val responseAsString: Future[String] = Unmarshal(entity).to[String]
+      println(responseAsString)
+      HttpResponse(HttpResponseStatus.OK.code, entity = HttpEntity(ContentTypes.`text/html(UTF-8)`, s"POST is successful."))
+    case request: HttpRequest =>
+      request.discardEntityBytes() // important to drain incoming HTTP Entity stream
+      HttpResponse(HttpResponseStatus.NOT_FOUND.code, entity = "Unsupported request")
   }
 
-  //val bindingFuture = Http(system).bindAndHandleSync(requestHandler, HttpHostName, HttpListenPort)
-  //println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+  val serverSource = Http(system).bind(interface = HttpHostName, port = HttpListenPort)
+  val bindingFuture: Future[Http.ServerBinding] =
+    serverSource.to(Sink.foreach { connection =>
+      // println("Accepted new connection from " + connection.remoteAddress)
+      connection handleWithSyncHandler requestHandler
+    }).run()
 
-  //bindingFuture
-  //  .flatMap(_.unbind()) // trigger unbinding from the port
-  //  .onComplete(_ => system.terminate()) // and shutdown when done
-
-
-  Http(system)
-    .bind(interface = HttpHostName, port = HttpListenPort)
-    .map { case connection =>
-      log.info("Accepted new connection from " + connection.remoteAddress)
-      connection.handleWithSyncHandler(requestHandler)
-    }
 
   def receive: Actor.Receive = {
+    case Terminated(kafka) =>
     case e =>
   }
 }
