@@ -39,6 +39,7 @@ object Dependencies {
     val akkaSlf4j: ModuleID = "com.typesafe.akka" %% "akka-slf4j" % Akka
     val akkaStream: ModuleID = "com.typesafe.akka" %% "akka-stream" % Akka
     val akkaHttpCore: ModuleID = "com.typesafe.akka" %% "akka-http-core" % AkkaHttp
+    val akkaHttpJson:ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttp
     val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % AkkaHttp
     val kafka: ModuleID = "org.apache.kafka" %% "kafka" % Kafka
     val kafkaStream: ModuleID = "org.apache.kafka" % "kafka-streams" % Kafka
@@ -56,7 +57,7 @@ object Dependencies {
 
   val config = Seq(scalaConfig)
 
-  val akka = Seq(akkaActor, akkaAgent, akkaCluster, akkaClusterMetrics, akkaSlf4j, akkaStream, akkaHttp, akkaHttpCore)
+  val akka = Seq(akkaActor, akkaAgent, akkaCluster, akkaClusterMetrics, akkaSlf4j, akkaStream, akkaHttp, akkaHttpCore, akkaHttpJson)
 
   // Module dependencies
   val core = time ++ config ++ logging ++ akka

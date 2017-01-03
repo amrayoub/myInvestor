@@ -14,6 +14,7 @@ CREATE TABLE exchange
 CREATE INDEX exchange_idx1 ON myinvestor.exchange(exchange_name);
 
 INSERT INTO exchange(exchange_id, exchange_name) VALUES(1, 'KLSE');
+INSERT INTO exchange(exchange_id, exchange_name) VALUES(2, 'NYSE');
 
 CREATE TABLE stock
 (

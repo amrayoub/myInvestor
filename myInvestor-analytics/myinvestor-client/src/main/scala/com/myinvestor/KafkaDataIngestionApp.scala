@@ -4,16 +4,15 @@ import java.util.Properties
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props, Terminated}
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model.{HttpEntity, _}
-import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.http.scaladsl.server.Directives.{complete, _}
 import akka.routing.BalancingPool
-import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import akka.util.{ByteString, Timeout}
+import akka.util.Timeout
 import com.myinvestor.KafkaEvent.KafkaMessageEnvelope
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import com.typesafe.config.ConfigFactory
-import io.netty.handler.codec.http.HttpResponseStatus
 import org.apache.kafka.common.serialization.StringSerializer
 
 import scala.concurrent.Future
@@ -83,41 +82,52 @@ class KafkaPublisherActor(val config: Properties) extends KafkaSenderActor[Strin
 }
 
 class HttpDataFeedActor(kafka: ActorRef) extends Actor with ActorLogging {
-  implicit val system = context.system
   val settings = new ClientSettings
+
   import settings._
 
-  context.watch(kafka)  // Watch for the termination
-
+  implicit val system = context.system
   implicit val askTimeout: Timeout = 500.millis
   implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system))
   implicit val executionContext = system.dispatcher
 
-  val requestHandler: HttpRequest => HttpResponse = {
-    case HttpRequest(HttpMethods.GET, Uri.Path("/"), _, _, _) =>
-      HttpResponse(HttpResponseStatus.OK.code, entity = HttpEntity(
-        ContentTypes.`text/html(UTF-8)`,
-        "<html><title>HTTP data feed actor</title><body>HTTP data feed actor</body></html>"))
-    case HttpRequest(HttpMethods.POST, Uri.Path("/trade/data"), headers, entity, _) =>
-      // Receive the JSON source trade data
-      val responseAsString: Future[String] = Unmarshal(entity).to[String]
-      println(responseAsString)
-      HttpResponse(HttpResponseStatus.OK.code, entity = HttpEntity(ContentTypes.`text/html(UTF-8)`, s"POST is successful."))
-    case request: HttpRequest =>
-      request.discardEntityBytes() // important to drain incoming HTTP Entity stream
-      HttpResponse(HttpResponseStatus.NOT_FOUND.code, entity = "Unsupported request")
+  // Watch for termination of the Kafka router
+  context.watch(kafka)
+
+  val route =
+    path("") {
+      get {
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<html><head><title>HTTP data feed</title></head<body><h1>HTTP data feed</h1></body></html>"))
+      }
+    }
+  path("exchange") {
+    post {
+      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<html><head><title>HTTP data feed</title></head<body><h1>HTTP data feed</h1></body></html>"))
+    }
   }
 
-  val serverSource = Http(system).bind(interface = HttpHostName, port = HttpListenPort)
-  val bindingFuture: Future[Http.ServerBinding] =
-    serverSource.to(Sink.foreach { connection =>
-      // println("Accepted new connection from " + connection.remoteAddress)
-      connection handleWithSyncHandler requestHandler
-    }).run()
+  path("stock/history") {
+    post {
+      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<html><head><title>HTTP data feed</title></head<body><h1>HTTP data feed</h1></body></html>"))
+    }
+  }
+  path("stock/info") {
+    post {
+      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<html><head><title>HTTP data feed</title></head<body><h1>HTTP data feed</h1></body></html>"))
+    }
+  }
+  path("stock") {
+    post {
+      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<html><head><title>HTTP data feed</title></head<body><h1>HTTP data feed</h1></body></html>"))
+    }
+  }
 
+  val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(route, HttpHostName, HttpListenPort)
 
   def receive: Actor.Receive = {
-    case Terminated(kafka) =>
+    case Terminated(kafka) => bindingFuture
+      .flatMap(_.unbind()) // trigger unbinding from the port
+      .onComplete(_ => system.terminate()) // and shutdown when done
     case e =>
   }
 }
