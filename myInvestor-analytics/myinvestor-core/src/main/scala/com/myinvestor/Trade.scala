@@ -16,6 +16,12 @@ object Trade {
   @SerialVersionUID(1L)
   sealed trait TradeModel extends Serializable
 
+  /**
+    * Generate a type 4 UUID.
+    * @return UUID version 4 string.
+    */
+  def UUIDVersion4 = java.util.UUID.randomUUID.toString
+
   case class Exchange(exchangeName: String) extends TradeModel
 
   case class Stock(symbol: String, name: String, exchangeName: String) extends TradeModel

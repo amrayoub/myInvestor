@@ -57,8 +57,15 @@ class KafkaDataProducer[K, V](config: Properties) {
       producer.send(new ProducerRecord[K, V](topic, key, message), new Callback() {
         override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
           if (exception != null) {
-            log.error("Unable to send record [" + message + "]")
-            log.error(exception.getMessage, exception)
+            // Request failed
+            log.error("Unable to send record [" + message + "]", exception)
+
+            // Update request in Cassandra
+
+          } else {
+            // Request is successful
+
+
           }
         }
       }
@@ -71,9 +78,7 @@ class KafkaDataProducer[K, V](config: Properties) {
 }
 
 object KafkaEvent {
-
   case class KafkaMessageEnvelope[K, V](topic: String, key: K, messages: V*)
-
 }
 
 object KafkaDataProducer {

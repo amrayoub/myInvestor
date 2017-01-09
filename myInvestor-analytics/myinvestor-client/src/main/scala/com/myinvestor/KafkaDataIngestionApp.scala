@@ -19,8 +19,9 @@ import com.typesafe.config.ConfigFactory
 import org.apache.kafka.common.serialization.StringSerializer
 import spray.json._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
+
 /**
   * Run with: sbt clients/run for automatic data file import to Kafka.
   *
@@ -63,8 +64,6 @@ final class HttpNodeGuardian extends ClusterAwareNodeGuardian {
     // As http data is received, publishes to Kafka.
     context.actorOf(BalancingPool(1).props(Props(new HttpDataFeedActor(router))), "dynamic-data-feed")
     log.info("Started data ingestion on {}.", cluster.selfAddress)
-
-    //router ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, "aaa")
   }
 
   def initialized: Actor.Receive = {
@@ -86,6 +85,7 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
   val log = Logger(this.getClass.getName)
 
   import settings._
+  import com.myinvestor.Trade._
 
   import ExecutionContext.Implicits.global
 
@@ -98,7 +98,8 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
       post {
         path("exchange") {
           entity(as[Exchange]) { exchange =>
-            val saved: Future[Done] = produceExchange(exchange)
+            val requestId = UUIDVersion4
+            val saved: Future[Done] = produceExchange(requestId, exchange)
             onComplete(saved) { done =>
               complete(exchange)
             }
@@ -106,9 +107,9 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
         }
       }
 
-
-  def produceExchange(exchange: Exchange): Future[Done] = {
+  def produceExchange(requestId: String, exchange: Exchange): Future[Done] = {
     val future: Future[Done] = Future {
+      // Log the request to Cassandra -- TODO
       kafka ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, exchange.toJson.compactPrint)
       log.info("Exchange received [" + exchange.toJson.compactPrint + "]")
       Done
@@ -122,10 +123,10 @@ class HttpDataFeedActor(kafka: ActorRef) extends Actor with ActorLogging {
 
   import settings._
 
-  implicit val system = context.system
+  implicit val system: ActorSystem = context.system
   implicit val askTimeout: Timeout = 500.millis
   implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system))
-  implicit val executionContext = system.dispatcher
+  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   val service = new HttpDataFeedService(kafka)
 
