@@ -23,7 +23,7 @@ final class ClientSettings (conf: Option[Config] = None) extends Serializable {
 
 
   val KafkaHosts = immutableSeq(kafka.getStringList("hosts")).toSet
-  val KafkaTopic: String = kafka.getString("topic.source")
+  val KafkaTopic: String = kafka.getString("topic.exchange")
   val KafkaKey: String = kafka.getString("group.id")
   val KafkaBatchSendSize: Int = kafka.getInt("batch.send.size")
 

@@ -110,6 +110,7 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
   def produceExchange(requestId: String, exchange: Exchange): Future[Done] = {
     val future: Future[Done] = Future {
       // Log the request to Cassandra -- TODO
+
       kafka ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, exchange.toJson.compactPrint)
       log.info("Exchange received [" + exchange.toJson.compactPrint + "]")
       Done

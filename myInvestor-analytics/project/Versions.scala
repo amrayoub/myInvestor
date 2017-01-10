@@ -28,6 +28,7 @@ object Versions {
   val ScalaLoggingSlf4j = "2.1.2"
   val TAVersion = "0.8"
   val ScalaConfig = "1.3.1"
+  val Cassandra = "3.1.3"
 
   // Plugins
 

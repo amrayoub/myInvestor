@@ -43,9 +43,13 @@ object Dependencies {
     val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % AkkaHttp
     val kafka: ModuleID = "org.apache.kafka" %% "kafka" % Kafka
     val kafkaStream: ModuleID = "org.apache.kafka" % "kafka-streams" % Kafka
+    val cassandraDriverCore: ModuleID = "com.datastax.cassandra" % "cassandra-driver-core" % Cassandra
+    val cassandraDriverMapping: ModuleID = "com.datastax.cassandra" % "cassandra-driver-mapping" % Cassandra
   }
 
   import Library._
+
+  val cassandra = Seq(cassandraDriverCore, cassandraDriverMapping)
 
   val spark = Seq(sparkCassandraConnector, sparkCore, sparkSql, sparkStreaming, sparkStreamingKafka, sparkGraphx)
 
@@ -62,7 +66,7 @@ object Dependencies {
   // Module dependencies
   val core = time ++ config ++ logging ++ akka
 
-  val client = spark ++ ta ++ akka
+  val client = spark ++ ta ++ akka ++ cassandra
 
   val app = spark ++ ta ++ akka ++ Seq(kafka, kafkaStream)
 

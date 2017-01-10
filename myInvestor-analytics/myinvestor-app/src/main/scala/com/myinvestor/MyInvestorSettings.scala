@@ -52,7 +52,7 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   val SparkStreamingBatchInterval: Long = withFallback[Long](Try(spark.getInt("streaming.batch.interval")), "spark.streaming.batch.interval") getOrElse 1000
 
-  val SparkCheckpointDir: String = myInvestor.getString("spark.checkpoint.dir")
+  val SparkCheckpointDir: String = spark.getString("spark.checkpoint.dir")
 
 
   // Cassandra settings
@@ -99,7 +99,6 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
   val CassandraReadSplitSize: Long = withFallback[Long](Try(cassandra.getLong("read.split.size")), "spark.cassandra.input.split.size") getOrElse 100000
 
   // Writes
-
   val CassandraWriteParallelismLevel: Int = withFallback[Int](Try(cassandra.getInt("write.concurrent.writes")), "spark.cassandra.output.concurrent.writes") getOrElse 5
 
   val CassandraWriteBatchSizeBytes: Int = withFallback[Int](Try(cassandra.getInt("write.batch.size.bytes")), "spark.cassandra.output.batch.size.bytes") getOrElse 64 * 1024

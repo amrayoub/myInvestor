@@ -88,7 +88,7 @@ object KafkaDataProducer {
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers.mkString(","))
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, serializerFqcn)
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, serializerFqcn)
-    props.put(ProducerConfig.ACKS_CONFIG, "1")
+    props.put(ProducerConfig.ACKS_CONFIG, "all")
     props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize.toString)
     props
   }

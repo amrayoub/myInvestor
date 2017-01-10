@@ -4,6 +4,14 @@ WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
 
 USE myInvestor;
 
+CREATE TABLE request
+(
+    request_id UUID,
+    sucess BOOLEAN,
+    error_msg TEXT,
+    PRIMARY KEY(request_id)
+);
+
 CREATE TABLE exchange
 (
     exchange_id INT,
