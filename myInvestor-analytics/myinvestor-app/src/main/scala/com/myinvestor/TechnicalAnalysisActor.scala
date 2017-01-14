@@ -7,7 +7,7 @@ import org.apache.spark.SparkContext
 /**
   * Perform technical analysis.
   */
-class TechnicalAnalysisActor(sc: SparkContext, settings: MyInvestorSettings) extends AggregationActor with ActorLogging {
+class TechnicalAnalysisActor(sc: SparkContext, settings: AppSettings) extends AggregationActor with ActorLogging {
   def receive: Actor.Receive = {
     case e: MovingAverage10 => movingAverage10(e.symbol, sender)
     case e: MovingAverage20 => movingAverage20(e.symbol, sender)

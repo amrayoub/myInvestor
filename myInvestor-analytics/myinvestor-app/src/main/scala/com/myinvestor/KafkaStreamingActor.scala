@@ -18,7 +18,7 @@ import org.apache.spark.streaming.kafka010._
   */
 class KafkaStreamingActor(kafkaParams: Map[String, Object],
                           ssc: StreamingContext,
-                          settings: MyInvestorSettings,
+                          settings: AppSettings,
                           listener: ActorRef) extends AggregationActor with ActorLogging {
 
   import settings._

@@ -15,7 +15,7 @@ import scala.concurrent.{Await, Future}
   * Can be run with sbt: sbt app/run
   */
 object MyInvestorApp extends App {
-  val settings = new MyInvestorSettings
+  val settings = new AppSettings
 
   import settings._
 
@@ -32,7 +32,7 @@ object MyInvestor extends ExtensionId[MyInvestor] with ExtensionIdProvider {
 
 class MyInvestor(system: ExtendedActorSystem) extends Extension {
 
-  val settings = new MyInvestorSettings
+  val settings = new AppSettings
 
   import settings._
 

@@ -15,7 +15,7 @@ import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
   * pipeline from Kafka to Cassandra, via Spark, which streams and transform the source data from Kafka,
   * and saves the new data to the cassandra data table on arrival.
   */
-class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], settings: MyInvestorSettings) extends ClusterAwareNodeGuardian with AggregationActor {
+class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], settings: AppSettings) extends ClusterAwareNodeGuardian with AggregationActor {
 
   import TradeEvent._
   import settings._

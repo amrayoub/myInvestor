@@ -1,9 +1,7 @@
 package com.myinvestor
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.marshalling.ToResponseMarshaller
-import akka.http.scaladsl.server.Directives
-import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
+import com.myinvestor.TradeSchema._
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import spray.json.{JsString, _}
@@ -13,31 +11,11 @@ import spray.json.{JsString, _}
   */
 object Trade {
 
-  @SerialVersionUID(1L)
-  sealed trait TradeModel extends Serializable
-
   /**
     * Generate a type 4 UUID.
     * @return UUID version 4 string.
     */
-  def UUIDVersion4 = java.util.UUID.randomUUID.toString
-
-  case class Exchange(exchangeName: String) extends TradeModel
-
-  case class Stock(symbol: String, name: String, exchangeName: String) extends TradeModel
-
-  case class StockHistory(symbol: String, exchangeName: String, date: DateTime,
-                          close: Double, high: Double,
-                          low: Double, open: Double,
-                          volume: Double) extends TradeModel
-
-  case class StockInfo(symbol: String, exchangeName: String, weeks52: String,
-                       beta: String, change: String, changePercentage: String,
-                       current: String, dividendYield: String, eps: String,
-                       instOwn: String, marketCapital: String, open: String,
-                       pe: String, range: String, shares: String,
-                       time: String, volume: String) extends TradeModel
-
+  def UUIDVersion4: String = java.util.UUID.randomUUID.toString
 
   trait JsonApiProtocol extends SprayJsonSupport with DefaultJsonProtocol {
 
@@ -70,35 +48,6 @@ object Trade {
     implicit val stockHistoryFormat = jsonFormat8(StockHistory)
     implicit val stockInfoFormat = jsonFormat17(StockInfo)
   }
-
-  /*
-  object Stock {
-    def apply(jsonObject: String): Stock = {
-      Stock(
-        symbol = "",
-        exchangeId = 0,
-        name = ""
-      )
-    }
-  }
-
-
-
-
-  object StockHistory {
-    def apply(jsonObject: String): StockHistory = {
-      StockHistory(
-        symbol = "",
-        date = DateTime.now,
-        close = 0.0,
-        high = 0.0,
-        low = 0.0,
-        open = 0.0,
-        volume = 0.0
-      )
-    }
-  }
-  */
 
 
   trait TradeAggregate extends TradeModel with Serializable {

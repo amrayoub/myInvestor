@@ -29,7 +29,7 @@ import scala.util.Try
   *
   * @param conf Optional config for test
   */
-final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable {
+final class AppSettings(conf: Option[Config] = None) extends Serializable {
 
   val localAddress: String = InetAddress.getLocalHost.getHostAddress
 
@@ -129,8 +129,6 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
 
   // Application settings
   val AppName: String = myInvestor.getString("app-name")
-  val CassandraKeyspace: String = myInvestor.getString("cassandra.keyspace")
-  val CassandraTableExchange: String = myInvestor.getString("cassandra.table.exchange")
 
   /**
     * Attempts to acquire from environment, then java system properties.

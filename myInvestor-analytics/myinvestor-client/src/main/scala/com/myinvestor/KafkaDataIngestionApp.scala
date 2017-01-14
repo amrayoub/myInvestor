@@ -13,14 +13,16 @@ import akka.routing.BalancingPool
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.Timeout
 import com.myinvestor.KafkaEvent.KafkaMessageEnvelope
-import com.myinvestor.Trade.{Exchange, JsonApiProtocol}
+import com.myinvestor.Trade.JsonApiProtocol
+import com.myinvestor.TradeSchema.Exchange
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.common.serialization.StringSerializer
+import org.apache.spark.{SparkConf, SparkContext}
 import spray.json._
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 /**
   * Run with: sbt clients/run for automatic data file import to Kafka.
@@ -30,6 +32,20 @@ object KafkaDataIngestionApp extends App {
 
   // Creates the ActorSystem.
   val system = ActorSystem("myInvestor", ConfigFactory.parseString("akka.remote.netty.tcp.port = 2551"))
+
+  protected val sparkConf = new SparkConf().setAppName(AppName)
+    .setMaster(SparkMaster)
+    .set("spark.cassandra.connection.host", CassandraHosts)
+    .set("spark.cleaner.ttl", SparkCleanerTtl.toString)
+    .set("spark.cassandra.auth.username", CassandraAuthUsername.toString)
+    .set("spark.cassandra.auth.password", CassandraAuthPassword.toString)
+
+  val sparkConf = new SparkConf(true)
+    .set("spark.cassandra.connection.host", settings.cassandraHost)
+    .set("spark.cassandra.auth.username", settings.cassandraUser)
+    .set("spark.cassandra.auth.password", settings.cassandraUserPassword)
+
+  val sc = new SparkContext(settings.sparkMaster, settings.sparkAppName, sparkConf)
 
   // The root supervisor and fault tolerance handler of the data ingestion nodes.
   val guardian = system.actorOf(Props[HttpNodeGuardian], "node-guardian")
@@ -84,8 +100,8 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
   val settings = new ClientSettings
   val log = Logger(this.getClass.getName)
 
-  import settings._
   import com.myinvestor.Trade._
+  import settings._
 
   import ExecutionContext.Implicits.global
 
@@ -109,7 +125,8 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
 
   def produceExchange(identifier: String, exchange: Exchange): Future[Done] = {
     val future: Future[Done] = Future {
-      // Log the request to Cassandra -- TODO
+      // Log the request to Cassandra
+
 
       kafka ! KafkaMessageEnvelope[String, String](identifier, KafkaTopicExchange, KafkaKey, exchange.toJson.compactPrint)
       log.info("Exchange received [" + exchange.toJson.compactPrint + "]")

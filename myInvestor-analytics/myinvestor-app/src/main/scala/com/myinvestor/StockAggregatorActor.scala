@@ -7,9 +7,8 @@ import org.apache.spark.streaming.StreamingContext
 /**
   * Aggregation and summary for stock market and stock.
   */
-class StockAggregatorActor(ssc: StreamingContext, settings: MyInvestorSettings) extends AggregationActor with ActorLogging {
+class StockAggregatorActor(ssc: StreamingContext, settings: AppSettings) extends AggregationActor with ActorLogging {
 
-  import settings.{CassandraKeyspace => keyspace}
 
   def receive: Actor.Receive = {
     case GetStockHistory(symbol) => history(symbol, sender)
