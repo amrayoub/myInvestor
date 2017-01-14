@@ -12,14 +12,23 @@ object Dependencies {
       module excludeAll (ExclusionRule("log4j"))
 
     def sparkExclusions: ModuleID =
-      module.log4jExclude.exclude("com.google.guava", "guava")
+      module.log4jExclude
         .exclude("org.apache.spark", "spark-core")
         .exclude("org.slf4j", "slf4j-log4j12")
+
+    def cassandraExclusions: ModuleID =
+      module.log4jExclude.exclude("com.google.guava", "guava")
+        .excludeAll(ExclusionRule("org.slf4j"))
+
+    def kafkaExclusions: ModuleID =
+      module.log4jExclude.excludeAll(ExclusionRule("org.slf4j"))
+        .exclude("com.sun.jmx", "jmxri")
+        .exclude("com.sun.jdmk", "jmxtools")
+        .exclude("net.sf.jopt-simple", "jopt-simple")
 
   }
 
   object Library {
-
     val technicalAnalysis: ModuleID = "eu.verdelhan" % "ta4j" % TAVersion
     val logback: ModuleID = "ch.qos.logback" % "logback-classic" % Logback
     val scalaLogging: ModuleID = "com.typesafe.scala-logging" %% "scala-logging" % ScalaLogging
@@ -27,7 +36,7 @@ object Dependencies {
     val scalaConfig: ModuleID = "com.typesafe" % "config" % ScalaConfig
     val jodaTime: ModuleID = "joda-time" % "joda-time" % JodaTime % "compile;runtime"
     val sparkCassandraConnector: ModuleID = "com.datastax.spark" %% "spark-cassandra-connector" % SparkCassandra
-    val sparkCore: ModuleID = "org.apache.spark" %% "spark-core" % Spark sparkExclusions
+    val sparkCore: ModuleID = "org.apache.spark" %% "spark-core" % Spark
     val sparkSql: ModuleID = "org.apache.spark" %% "spark-sql" % Spark sparkExclusions
     val sparkStreaming: ModuleID = "org.apache.spark" %% "spark-streaming" % Spark sparkExclusions
     val sparkStreamingKafka: ModuleID = "org.apache.spark" %% "spark-streaming-kafka-0-10" % Spark sparkExclusions
@@ -41,10 +50,10 @@ object Dependencies {
     val akkaHttpCore: ModuleID = "com.typesafe.akka" %% "akka-http-core" % AkkaHttp
     val akkaHttpJson:ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttp
     val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % AkkaHttp
-    val kafka: ModuleID = "org.apache.kafka" %% "kafka" % Kafka
-    val kafkaStream: ModuleID = "org.apache.kafka" % "kafka-streams" % Kafka
-    val cassandraDriverCore: ModuleID = "com.datastax.cassandra" % "cassandra-driver-core" % Cassandra
-    val cassandraDriverMapping: ModuleID = "com.datastax.cassandra" % "cassandra-driver-mapping" % Cassandra
+    val kafka: ModuleID = "org.apache.kafka" %% "kafka" % Kafka kafkaExclusions
+    val kafkaStream: ModuleID = "org.apache.kafka" % "kafka-streams" % Kafka kafkaExclusions
+    val cassandraDriverCore: ModuleID = "com.datastax.cassandra" % "cassandra-driver-core" % Cassandra cassandraExclusions
+    val cassandraDriverMapping: ModuleID = "com.datastax.cassandra" % "cassandra-driver-mapping" % Cassandra cassandraExclusions
   }
 
   import Library._

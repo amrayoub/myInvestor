@@ -122,7 +122,7 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
   // Kakfa settings
   val KafkaHosts: String = withFallback[String](Try(kafka.getString("hosts")), "kafka.hosts") getOrElse "localhost:9092"
   val KafkaGroupId: String = kafka.getString("group.id")
-  val KafkaTopicSource: String = kafka.getString("topic.source")
+  val KafkaTopicExchange: String = kafka.getString("topic.exchange")
   val KafkaDeserializerFqcn: String = kafka.getString("deserializer.fqcn")
   val KafkaAutoOffsetReset: String = kafka.getString("auto-offset-reset")
   val KafkaEnableAutoCommit: Boolean = kafka.getBoolean("enable.auto.commit")
@@ -130,7 +130,7 @@ final class MyInvestorSettings(conf: Option[Config] = None) extends Serializable
   // Application settings
   val AppName: String = myInvestor.getString("app-name")
   val CassandraKeyspace: String = myInvestor.getString("cassandra.keyspace")
-  val CassandraTableSource: String = myInvestor.getString("cassandra.table.source")
+  val CassandraTableExchange: String = myInvestor.getString("cassandra.table.exchange")
 
   /**
     * Attempts to acquire from environment, then java system properties.

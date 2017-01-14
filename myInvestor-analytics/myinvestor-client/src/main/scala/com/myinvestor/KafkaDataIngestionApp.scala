@@ -98,8 +98,8 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
       post {
         path("exchange") {
           entity(as[Exchange]) { exchange =>
-            val requestId = UUIDVersion4
-            val saved: Future[Done] = produceExchange(requestId, exchange)
+            val identifier = UUIDVersion4
+            val saved: Future[Done] = produceExchange(identifier, exchange)
             onComplete(saved) { done =>
               complete(exchange)
             }
@@ -107,11 +107,11 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
         }
       }
 
-  def produceExchange(requestId: String, exchange: Exchange): Future[Done] = {
+  def produceExchange(identifier: String, exchange: Exchange): Future[Done] = {
     val future: Future[Done] = Future {
       // Log the request to Cassandra -- TODO
 
-      kafka ! KafkaMessageEnvelope[String, String](KafkaTopic, KafkaKey, exchange.toJson.compactPrint)
+      kafka ! KafkaMessageEnvelope[String, String](identifier, KafkaTopicExchange, KafkaKey, exchange.toJson.compactPrint)
       log.info("Exchange received [" + exchange.toJson.compactPrint + "]")
       Done
     }

@@ -2,15 +2,11 @@ package com.myinvestor
 
 import akka.japi.Util.immutableSeq
 import com.typesafe.config.{Config, ConfigFactory}
-import akka.japi.Util.immutableSeq
-import org.apache.spark.internal.config
-
-import scala.collection.immutable
 
 /**
   * Client configuration settings
   */
-final class ClientSettings (conf: Option[Config] = None) extends Serializable {
+final class ClientSettings(conf: Option[Config] = None) extends Serializable {
 
   val rootConfig: Config = conf match {
     case Some(c) => c.withFallback(ConfigFactory.load())
@@ -22,12 +18,12 @@ final class ClientSettings (conf: Option[Config] = None) extends Serializable {
   protected val myInvestor: Config = rootConfig.getConfig("myInvestor")
 
 
-  val KafkaHosts = immutableSeq(kafka.getStringList("hosts")).toSet
-  val KafkaTopic: String = kafka.getString("topic.exchange")
+  val KafkaHosts: Set[String] = immutableSeq(kafka.getStringList("hosts")).toSet
+  val KafkaTopicExchange: String = kafka.getString("topic.exchange")
   val KafkaKey: String = kafka.getString("group.id")
   val KafkaBatchSendSize: Int = kafka.getInt("batch.send.size")
 
-  val HttpHostName = myInvestor.getString("http.host")
-  val HttpListenPort = myInvestor.getInt("http.port")
+  val HttpHostName: String = myInvestor.getString("http.host")
+  val HttpListenPort: Int = myInvestor.getInt("http.port")
 
 }

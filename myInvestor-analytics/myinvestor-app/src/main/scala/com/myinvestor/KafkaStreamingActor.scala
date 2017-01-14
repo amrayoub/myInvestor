@@ -2,7 +2,9 @@ package com.myinvestor
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.myinvestor.TradeEvent.OutputStreamInitialized
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.spark.streaming.StreamingContext
+import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010._
@@ -22,11 +24,11 @@ class KafkaStreamingActor(kafkaParams: Map[String, Object],
   import settings._
 
   // TODO
-  val topics = Array(KafkaTopicSource)
-  val kafkaStream = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
+  val topics = Array(KafkaTopicExchange)
+  val kafkaStream: InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
 
   // For debugging
-  kafkaStream.map(record=>(record.value().toString)).print
+  kafkaStream.map(record => record.value.toString).print
 
   // Notifies the supervisor that the Spark Streams have been created and defined.
   // Now the [[StreamingContext]] can be started.

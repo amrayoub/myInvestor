@@ -46,31 +46,26 @@ class KafkaDataProducer[K, V](config: Properties) {
 
   // Sends the data, partitioned by key to the topic.
   def send(e: KafkaMessageEnvelope[K, V]): Unit =
-    batchSend(e.topic, e.key, e.messages)
+    send(e.identifier, e.topic, e.key, e.message)
 
   // Sends a single message.
-  def send(topic: String, key: K, message: V): Unit =
-    batchSend(topic, key, Seq(message))
+  def send(identifier: String, topic: String, key: K, message: V): Unit = {
+    producer.send(new ProducerRecord[K, V](topic, key, message), new Callback() {
+      override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
+        if (exception != null) {
+          // Request failed
+          log.error("Unable to send record [" + message + "]", exception)
 
-  def batchSend(topic: String, key: K, batch: Seq[V]): Unit = {
-    for (message <- batch) {
-      producer.send(new ProducerRecord[K, V](topic, key, message), new Callback() {
-        override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
-          if (exception != null) {
-            // Request failed
-            log.error("Unable to send record [" + message + "]", exception)
+          // Update request in Cassandra
 
-            // Update request in Cassandra
-
-          } else {
-            // Request is successful
+        } else {
+          // Request is successful
 
 
-          }
         }
       }
-      )
     }
+    )
   }
 
   def close(): Unit = producer.close()
@@ -78,7 +73,9 @@ class KafkaDataProducer[K, V](config: Properties) {
 }
 
 object KafkaEvent {
-  case class KafkaMessageEnvelope[K, V](topic: String, key: K, messages: V*)
+
+  case class KafkaMessageEnvelope[K, V](identifier: String, topic: String, key: K, message: V)
+
 }
 
 object KafkaDataProducer {
