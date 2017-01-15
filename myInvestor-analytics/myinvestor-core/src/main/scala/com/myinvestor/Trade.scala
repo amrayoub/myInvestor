@@ -1,5 +1,7 @@
 package com.myinvestor
 
+import java.util.UUID
+
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.myinvestor.TradeSchema._
 import org.joda.time.DateTime
@@ -15,7 +17,7 @@ object Trade {
     * Generate a type 4 UUID.
     * @return UUID version 4 string.
     */
-  def UUIDVersion4: String = java.util.UUID.randomUUID.toString
+  def UUIDVersion4: UUID = java.util.UUID.randomUUID
 
   trait JsonApiProtocol extends SprayJsonSupport with DefaultJsonProtocol {
 

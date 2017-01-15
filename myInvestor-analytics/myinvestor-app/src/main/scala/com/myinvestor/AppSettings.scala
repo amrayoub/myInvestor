@@ -31,7 +31,8 @@ import scala.util.Try
   */
 final class AppSettings(conf: Option[Config] = None) extends Serializable {
 
-  val localAddress: String = InetAddress.getLocalHost.getHostAddress
+  // val localAddress: String = InetAddress.getLocalHost.getHostAddress
+  val localAddress: String = "localhost"
 
   val rootConfig: Config = conf match {
     case Some(c) => c.withFallback(ConfigFactory.load())
@@ -74,50 +75,6 @@ final class AppSettings(conf: Option[Config] = None) extends Serializable {
       case None => NoAuthConf
     }
   }
-
-  val CassandraRpcPort: Int = withFallback[Int](Try(cassandra.getInt("connection.rpc.port")), "spark.cassandra.connection.rpc.port") getOrElse 9160
-
-  val CassandraNativePort: Int = withFallback[Int](Try(cassandra.getInt("connection.native.port")), "spark.cassandra.connection.native.port") getOrElse 9042
-
-  // Tuning
-
-  val CassandraKeepAlive: Int = withFallback[Int](Try(cassandra.getInt("connection.keep-alive")), "spark.cassandra.connection.keep_alive_ms") getOrElse 1000
-
-  val CassandraRetryCount: Int = withFallback[Int](Try(cassandra.getInt("connection.query.retry-count")), "spark.cassandra.query.retry.count") getOrElse 10
-
-  val CassandraConnectionReconnectDelayMin: Int = withFallback[Int](Try(cassandra.getInt("connection.reconnect-delay.min")), "spark.cassandra.connection.reconnection_delay_ms.min") getOrElse 1000
-
-  val CassandraConnectionReconnectDelayMax: Int = withFallback[Int](Try(cassandra.getInt("reconnect-delay.max")), "spark.cassandra.connection.reconnection_delay_ms.max") getOrElse 60000
-
-  // Reads
-  val CassandraReadPageRowSize: Int = withFallback[Int](Try(cassandra.getInt("read.page.row.size")), "spark.cassandra.input.page.row.size") getOrElse 1000
-
-  val CassandraReadConsistencyLevel: ConsistencyLevel = ConsistencyLevel.valueOf(
-    withFallback[String](Try(cassandra.getString("read.consistency.level")),
-      "spark.cassandra.input.consistency.level") getOrElse ConsistencyLevel.LOCAL_ONE.name)
-
-  val CassandraReadSplitSize: Long = withFallback[Long](Try(cassandra.getLong("read.split.size")), "spark.cassandra.input.split.size") getOrElse 100000
-
-  // Writes
-  val CassandraWriteParallelismLevel: Int = withFallback[Int](Try(cassandra.getInt("write.concurrent.writes")), "spark.cassandra.output.concurrent.writes") getOrElse 5
-
-  val CassandraWriteBatchSizeBytes: Int = withFallback[Int](Try(cassandra.getInt("write.batch.size.bytes")), "spark.cassandra.output.batch.size.bytes") getOrElse 64 * 1024
-
-  private val CassandraWriteBatchSizeRows: String = withFallback[String](Try(cassandra.getString("write.batch.size.rows")), "spark.cassandra.output.batch.size.rows") getOrElse "auto"
-
-  val CassandraWriteBatchRowSize: Option[Int] = {
-    val NumberPattern = "([0-9]+)".r
-    CassandraWriteBatchSizeRows match {
-      case "auto" => None
-      case NumberPattern(x) => Some(x.toInt)
-      case other =>
-        throw new IllegalArgumentException(s"Invalid value for 'cassandra.output.batch.size.rows': $other. Number or 'auto' expected")
-    }
-  }
-
-  val CassandraWriteConsistencyLevel: ConsistencyLevel = ConsistencyLevel.valueOf(withFallback[String](Try(cassandra.getString("write.consistency.level")), "spark.cassandra.output.consistency.level") getOrElse ConsistencyLevel.LOCAL_ONE.name)
-
-  val CassandraDefaultMeasuredInsertsCount: Int = 128
 
   // Kakfa settings
   val KafkaHosts: String = withFallback[String](Try(kafka.getString("hosts")), "kafka.hosts") getOrElse "localhost:9092"

@@ -1,6 +1,7 @@
 package com.myinvestor
 
-import com.myinvestor.Trade.TradeModel
+import java.util.UUID
+
 import org.joda.time.DateTime
 
 /**
@@ -8,17 +9,29 @@ import org.joda.time.DateTime
   */
 object TradeSchema {
 
-  val KeySpace = "myinvestor"
+  // Keyspace
+  val Keyspace = "myinvestor"
 
+  // Tables
   val RequestTable = "request"
   val ExchangeTable = "exchange"
   val StockTable = "stock"
   val StockHistoryTable = "stock_history"
   val StockDetailsTable = "stock_details"
 
+  // Columns
+  val RequestIdColumn = "request_id"
+  val SuccessColumn = "success"
+  val ErrorMsgColumn = "error_msg"
+  val ExchangeNameColumn = "exchange_name"
+
+
+  // Classes
 
   @SerialVersionUID(1L)
   trait TradeModel extends Serializable
+
+  case class Request(requestId: UUID, success: Boolean, errorMsg: String)
 
   case class Exchange(exchangeName: String) extends TradeModel
 

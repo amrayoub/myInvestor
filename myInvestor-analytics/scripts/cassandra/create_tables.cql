@@ -7,48 +7,45 @@ USE myInvestor;
 CREATE TABLE request
 (
     request_id UUID,
-    sucess BOOLEAN,
+    success BOOLEAN,
     error_msg TEXT,
     PRIMARY KEY(request_id)
 );
 
 CREATE TABLE exchange
 (
-    exchange_id INT,
     exchange_name TEXT,
-    PRIMARY KEY(exchange_id)
+    PRIMARY KEY(exchange_name)
 );
 
-CREATE INDEX exchange_idx1 ON myinvestor.exchange(exchange_name);
-
-INSERT INTO exchange(exchange_id, exchange_name) VALUES(1, 'KLSE');
-INSERT INTO exchange(exchange_id, exchange_name) VALUES(2, 'NYSE');
+INSERT INTO exchange(exchange_name) VALUES('KLSE');
+INSERT INTO exchange(exchange_name) VALUES('NYSE');
 
 CREATE TABLE stock
 (
     stock_symbol TEXT,
+    exchange_name TEXT,
     stock_name TEXT,
-    exchange_id INT,
-    PRIMARY KEY(stock_symbol)
+    PRIMARY KEY(exchange_name, stock_symbol)
 );
-CREATE INDEX stock_idx1 ON myinvestor.stock(exchange_id);
-
 
 CREATE TABLE stock_history
 (
     stock_symbol TEXT,
+    exchange_name TEXT,
     history_date TIMESTAMP,
     history_open DECIMAL,
     history_high DECIMAL,
     history_low DECIMAL,
     history_close DECIMAL,
     history_volume INT,
-    PRIMARY KEY(stock_symbol, history_date)
+    PRIMARY KEY(exchange_name, stock_symbol, history_date)
 );
 
 CREATE TABLE stock_details
 (
     stock_symbol TEXT,
+    exchange_name TEXT,
     details_52weeks_from DECIMAL,
     details_52weeks_to DECIMAL,
     details_beta DECIMAL,
@@ -67,7 +64,7 @@ CREATE TABLE stock_details
     details_time TEXT,
     details_volume TEXT,
     details_extracted_timestamp TIMESTAMP,  
-    PRIMARY KEY(stock_symbol, details_extracted_timestamp)
+    PRIMARY KEY(exchange_name, stock_symbol, details_extracted_timestamp)
 );
 
 
