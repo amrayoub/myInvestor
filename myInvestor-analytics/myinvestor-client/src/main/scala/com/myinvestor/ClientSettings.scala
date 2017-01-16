@@ -1,9 +1,9 @@
 package com.myinvestor
 
-import java.net.InetAddress
-
 import akka.japi.Util.immutableSeq
+import com.datastax.spark.connector.{SomeColumns, _}
 import com.datastax.spark.connector.cql.{AuthConf, NoAuthConf, PasswordAuthConf}
+import com.myinvestor.TradeSchema._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -68,7 +68,7 @@ final class ClientSettings(conf: Option[Config] = None) extends Serializable {
     }
   }
 
-  object SparkContextLoader {
+  object SparkContextUtils {
 
     val sparkConf: SparkConf = new SparkConf().setAppName(AppName)
       .setMaster(SparkMaster)
@@ -78,6 +78,11 @@ final class ClientSettings(conf: Option[Config] = None) extends Serializable {
       .set("spark.cassandra.auth.password", CassandraAuthPassword.toString)
 
     val sparkContext: SparkContext = new SparkContext(sparkConf)
+
+    def saveRequest(request: Request): Unit = {
+      val collection = sparkContext.parallelize(Seq(request))
+      collection.saveToCassandra(Keyspace, RequestTable, SomeColumns(RequestIdColumn, SuccessColumn, ErrorMsgColumn))
+    }
 
   }
 

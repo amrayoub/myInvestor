@@ -15,7 +15,6 @@ import akka.util.Timeout
 import com.datastax.spark.connector._
 import com.myinvestor.KafkaEvent.KafkaMessageEnvelope
 import com.myinvestor.Trade.JsonApiProtocol
-import com.myinvestor.TradeSchema.Exchange
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.common.serialization.StringSerializer
@@ -89,10 +88,17 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
 
   import com.myinvestor.Trade._
   import com.myinvestor.TradeSchema._
-
   import settings._
 
   import ExecutionContext.Implicits.global
+
+  def formatResponse(identifier: UUID): String = {
+       val requestId = identifier.toString
+       s"""{
+          |"id":"$requestId"
+          |}
+          """.stripMargin
+  }
 
   val route =
     get {
@@ -106,7 +112,7 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
             val identifier = UUIDVersion4
             val saved: Future[Done] = produceExchange(identifier, exchange)
             onComplete(saved) { done =>
-              complete(exchange)
+              complete(HttpEntity(ContentTypes.`application/json`,formatResponse(identifier)))
             }
           }
         }
@@ -115,10 +121,7 @@ class HttpDataFeedService(kafka: ActorRef) extends Directives with JsonApiProtoc
   def produceExchange(identifier: UUID, exchange: Exchange): Future[Done] = {
     val future: Future[Done] = Future {
       // Log the request to Cassandra
-      val sc = SparkContextLoader.sparkContext
-      val collection = sc.parallelize(Seq(Request(identifier, false, "")))
-      collection.saveToCassandra(Keyspace, RequestTable, SomeColumns(RequestIdColumn, SuccessColumn, ErrorMsgColumn))
-
+      SparkContextUtils.saveRequest(Request(identifier, false, ""))
       kafka ! KafkaMessageEnvelope[String, String](identifier.toString, KafkaTopicExchange, KafkaKey, exchange.toJson.compactPrint)
       log.info("Exchange received [" + exchange.toJson.compactPrint + "]")
       Done

@@ -5,7 +5,7 @@ import java.util.UUID
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.myinvestor.TradeSchema._
 import org.joda.time.DateTime
-import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
 import spray.json.{JsString, _}
 
 /**
@@ -15,14 +15,23 @@ object Trade {
 
   /**
     * Generate a type 4 UUID.
+    *
     * @return UUID version 4 string.
     */
   def UUIDVersion4: UUID = java.util.UUID.randomUUID
 
+  /**
+    * Generate a UUID from string
+    *
+    * @param uuid UUID string
+    * @return An UUID
+    */
+  def UUIDfromString(uuid: String): UUID = java.util.UUID.fromString(uuid)
+
   trait JsonApiProtocol extends SprayJsonSupport with DefaultJsonProtocol {
 
     implicit object DateTimeFormat extends RootJsonFormat[DateTime] {
-      val formatter = ISODateTimeFormat.basicDateTimeNoMillis
+      val formatter: DateTimeFormatter = ISODateTimeFormat.basicDateTimeNoMillis
 
       def write(obj: DateTime): JsValue = {
         JsString(formatter.print(obj))

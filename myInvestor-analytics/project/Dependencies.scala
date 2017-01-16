@@ -48,12 +48,19 @@ object Dependencies {
     val akkaSlf4j: ModuleID = "com.typesafe.akka" %% "akka-slf4j" % Akka
     val akkaStream: ModuleID = "com.typesafe.akka" %% "akka-stream" % Akka
     val akkaHttpCore: ModuleID = "com.typesafe.akka" %% "akka-http-core" % AkkaHttp
-    val akkaHttpJson:ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttp
+    val akkaHttpJson: ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttp
     val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % AkkaHttp
     val kafka: ModuleID = "org.apache.kafka" %% "kafka" % Kafka kafkaExclusions
     val kafkaStream: ModuleID = "org.apache.kafka" % "kafka-streams" % Kafka kafkaExclusions
     val cassandraDriverCore: ModuleID = "com.datastax.cassandra" % "cassandra-driver-core" % Cassandra cassandraExclusions
     val cassandraDriverMapping: ModuleID = "com.datastax.cassandra" % "cassandra-driver-mapping" % Cassandra cassandraExclusions
+  }
+
+  object Test {
+    val akkaTestKit: ModuleID = "com.typesafe.akka" %% "akka-testkit" % Akka % "test"
+    val scalatest: ModuleID = "org.scalatest" %% "scalatest" % ScalaTest % "test"
+    val scalactic: ModuleID = "org.scalactic" %% "scalactic" % ScalaTest % "test"
+    val supersafe: ModuleID = "com.artima.supersafe" % "supersafe_2.11.8" % SuperSafe % "test"
   }
 
   import Library._
@@ -72,12 +79,14 @@ object Dependencies {
 
   val akka = Seq(akkaActor, akkaAgent, akkaCluster, akkaClusterMetrics, akkaSlf4j, akkaStream, akkaHttp, akkaHttpCore, akkaHttpJson)
 
+  val test = Seq(Test.akkaTestKit, Test.scalatest, Test.scalactic, Test.supersafe)
+
   // Module dependencies
   val core = time ++ config ++ logging ++ akka
 
-  val client = spark ++ ta ++ akka ++ cassandra
+  val client = spark ++ ta ++ akka ++ cassandra ++ test
 
-  val app = spark ++ ta ++ akka ++ Seq(kafka, kafkaStream)
+  val app = spark ++ ta ++ akka ++ Seq(kafka, kafkaStream) ++ test
 
   val example = spark ++ ta
 

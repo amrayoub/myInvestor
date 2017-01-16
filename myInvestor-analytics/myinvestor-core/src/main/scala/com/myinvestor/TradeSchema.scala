@@ -48,4 +48,6 @@ object TradeSchema {
                        instOwn: String, marketCapital: String, open: String,
                        pe: String, range: String, shares: String,
                        time: String, volume: String) extends TradeModel
+
+
 }

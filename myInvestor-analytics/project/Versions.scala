@@ -2,16 +2,16 @@ object Versions {
 
   // App settings
   val name = "myInvestor"
-  val organization =  "com.myInvestor"
+  val organization = "com.myInvestor"
   val homePage = "http://www.github.com/mengwangk/myinvestor"
   val apacheLicense = "Apache License, Version 2.0"
   val apacheLicenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-  
+
 
   // App versions
   val myInvestor = "0.0.1"
-  
-  
+
+
   // Compiler versions
   val JDK = "1.8"
   val Scala = "2.11.8"
@@ -29,6 +29,8 @@ object Versions {
   val TAVersion = "0.8"
   val ScalaConfig = "1.3.1"
   val Cassandra = "3.1.3"
+  val ScalaTest = "3.0.1"
+  val SuperSafe = "1.1.0"
 
   // Plugins
 
