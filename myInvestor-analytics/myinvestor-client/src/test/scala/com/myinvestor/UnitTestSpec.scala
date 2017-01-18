@@ -1,8 +1,10 @@
 package com.myinvestor
 
+import org.scalatest._
+
 /**
-  * Base class for all test scenarios.
+  * Base class for all unit test scenarios.
   */
-class AbstractSpec {
+abstract class UnitTestSpec extends FlatSpec with Matchers with OptionValues with Inside with Inspectors {
 
 }

@@ -13,15 +13,17 @@ object Dependencies {
 
     def sparkExclusions: ModuleID =
       module.log4jExclude
-        .exclude("org.apache.spark", "spark-core")
+        .exclude("com.google.guava", "guava")
         .exclude("org.slf4j", "slf4j-log4j12")
 
     def cassandraExclusions: ModuleID =
-      module.log4jExclude.exclude("com.google.guava", "guava")
+      module.log4jExclude
+        .exclude("com.google.guava", "guava")
         .excludeAll(ExclusionRule("org.slf4j"))
 
     def kafkaExclusions: ModuleID =
-      module.log4jExclude.excludeAll(ExclusionRule("org.slf4j"))
+      module.log4jExclude
+        .excludeAll(ExclusionRule("org.slf4j"))
         .exclude("com.sun.jmx", "jmxri")
         .exclude("com.sun.jdmk", "jmxtools")
         .exclude("net.sf.jopt-simple", "jopt-simple")
@@ -36,7 +38,7 @@ object Dependencies {
     val scalaConfig: ModuleID = "com.typesafe" % "config" % ScalaConfig
     val jodaTime: ModuleID = "joda-time" % "joda-time" % JodaTime % "compile;runtime"
     val sparkCassandraConnector: ModuleID = "com.datastax.spark" %% "spark-cassandra-connector" % SparkCassandra
-    val sparkCore: ModuleID = "org.apache.spark" %% "spark-core" % Spark
+    val sparkCore: ModuleID = "org.apache.spark" %% "spark-core" % Spark sparkExclusions
     val sparkSql: ModuleID = "org.apache.spark" %% "spark-sql" % Spark sparkExclusions
     val sparkStreaming: ModuleID = "org.apache.spark" %% "spark-streaming" % Spark sparkExclusions
     val sparkStreamingKafka: ModuleID = "org.apache.spark" %% "spark-streaming-kafka-0-10" % Spark sparkExclusions
@@ -52,8 +54,9 @@ object Dependencies {
     val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % AkkaHttp
     val kafka: ModuleID = "org.apache.kafka" %% "kafka" % Kafka kafkaExclusions
     val kafkaStream: ModuleID = "org.apache.kafka" % "kafka-streams" % Kafka kafkaExclusions
-    val cassandraDriverCore: ModuleID = "com.datastax.cassandra" % "cassandra-driver-core" % Cassandra cassandraExclusions
-    val cassandraDriverMapping: ModuleID = "com.datastax.cassandra" % "cassandra-driver-mapping" % Cassandra cassandraExclusions
+    //val cassandraDriverCore: ModuleID = "com.datastax.cassandra" % "cassandra-driver-core" % Cassandra cassandraExclusions
+    //val cassandraDriverMapping: ModuleID = "com.datastax.cassandra" % "cassandra-driver-mapping" % Cassandra cassandraExclusions
+    val guava: ModuleID = "com.google.guava" % "guava" % Guava
   }
 
   object Test {
@@ -61,15 +64,18 @@ object Dependencies {
     val scalatest: ModuleID = "org.scalatest" %% "scalatest" % ScalaTest % "test"
     val scalactic: ModuleID = "org.scalactic" %% "scalactic" % ScalaTest % "test"
     val supersafe: ModuleID = "com.artima.supersafe" % "supersafe_2.11.8" % SuperSafe % "test"
+    val log4j: ModuleID = "log4j" % "log4j" % Log4j % "test"
   }
 
   import Library._
 
-  val cassandra = Seq(cassandraDriverCore, cassandraDriverMapping)
+  //val cassandra = Seq(cassandraDriverMapping)
 
   val spark = Seq(sparkCassandraConnector, sparkCore, sparkSql, sparkStreaming, sparkStreamingKafka, sparkGraphx)
 
   val logging = Seq(logback, scalaLogging, scalaLoggingSlf4j)
+
+  val utils = Seq(guava)
 
   val ta = Seq(technicalAnalysis)
 
@@ -79,12 +85,12 @@ object Dependencies {
 
   val akka = Seq(akkaActor, akkaAgent, akkaCluster, akkaClusterMetrics, akkaSlf4j, akkaStream, akkaHttp, akkaHttpCore, akkaHttpJson)
 
-  val test = Seq(Test.akkaTestKit, Test.scalatest, Test.scalactic, Test.supersafe)
+  val test = Seq(Test.akkaTestKit, Test.scalatest, Test.scalactic, Test.supersafe, Test.log4j)
 
   // Module dependencies
-  val core = time ++ config ++ logging ++ akka
+  val core = time ++ config ++ logging ++ akka ++ utils
 
-  val client = spark ++ ta ++ akka ++ cassandra ++ test
+  val client = spark ++ ta ++ akka ++ test
 
   val app = spark ++ ta ++ akka ++ Seq(kafka, kafkaStream) ++ test
 
