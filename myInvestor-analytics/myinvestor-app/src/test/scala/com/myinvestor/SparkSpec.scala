@@ -1,8 +1,22 @@
 package com.myinvestor
 
+import org.apache.spark.SparkContext
+import org.apache.spark.streaming.StreamingContext
+import org.scalatest.{BeforeAndAfterAll, Failed, Outcome, Suite}
+
 /**
-  * Created by MEKOH on 1/21/2017.
   */
-class SparkSpec {
+trait SparkSpec extends BeforeAndAfterAll {
+  this: Suite =>
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+
+
+  }
+
+  override def afterAll(): Unit = {
+
+  }
 
 }

@@ -44,7 +44,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
     */
   override def initialize(): Unit = {
     super.initialize()
-    ssc.checkpoint(SparkCheckpointDir)
+    // ssc.checkpoint(SparkCheckpointDir)
     ssc.start() // currently can not add more dstreams once started
 
     context become initialized

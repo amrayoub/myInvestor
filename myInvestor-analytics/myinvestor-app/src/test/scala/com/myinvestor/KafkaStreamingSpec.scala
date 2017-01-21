@@ -1,26 +1,15 @@
 package com.myinvestor
-
-import org.apache.spark.SparkContext
-import org.scalatest.BeforeAndAfter
+import org.scalatest.Outcome
 
 /**
   * Test suite for Kafka.
   */
-class KafkaStreamingSpec extends UnitTestSpec with BeforeAndAfter {
+abstract class KafkaStreamingSpec extends UnitTestSpec with SparkSpec {
 
-  var sparkContext: SparkContext = _
-
-  before {
-    sparkContext = SparkContextUtils.sp
-  }
-
-  after {
-  }
 
   "A valid exchange JSON" should "be converted correctly to a correct Exchange object" in {
-
-
   }
+
 
 }
 

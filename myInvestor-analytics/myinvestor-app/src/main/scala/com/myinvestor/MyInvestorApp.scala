@@ -4,8 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.actor.{ActorSystem, Address, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
 import akka.cluster.Cluster
-import org.apache.spark.SparkConf
-import org.apache.spark.streaming.{Milliseconds, StreamingContext}
+import org.apache.spark.streaming.StreamingContext
 
 import scala.concurrent.{Await, Future}
 
@@ -34,9 +33,8 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
 
   val settings = new AppSettings
 
-  import settings._
-
   import TradeEvent.GracefulShutdown
+  import settings._
   import system.dispatcher
 
   val nodeGuardianActorName = "node-guardian"
@@ -49,17 +47,8 @@ class MyInvestor(system: ExtendedActorSystem) extends Extension {
 
   implicit private val timeout = system.settings.CreationTimeout
 
-  // Configures Spark
-  protected val conf = new SparkConf().setAppName(AppName)
-    .setMaster(SparkMaster)
-    .set("spark.cassandra.connection.host", CassandraHosts)
-    .set("spark.cleaner.ttl", SparkCleanerTtl.toString)
-    .set("spark.cassandra.auth.username", CassandraAuthUsername.toString)
-    .set("spark.cassandra.auth.password", CassandraAuthPassword.toString)
-
-
   // Creates the Spark Streaming context.
-  protected val ssc = new StreamingContext(conf, Milliseconds(SparkStreamingBatchInterval))
+  protected val ssc: StreamingContext = SparkContextUtils.streamingContext
 
   // Configure Kafka
   val kafkaParams: Map[String, Object] = Map[String, Object](

@@ -1,8 +1,9 @@
 package com.myinvestor
+import org.scalatest.{Outcome, Tag}
 
 /**
-  * Created by MEKOH on 1/21/2017.
+  * Kafka streaming actor test suite.
   */
-class KafkaStreamingActorSpec {
+class KafkaStreamingActorSpec  {
 
 }

@@ -54,8 +54,6 @@ object Dependencies {
     val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % AkkaHttp
     val kafka: ModuleID = "org.apache.kafka" %% "kafka" % Kafka kafkaExclusions
     val kafkaStream: ModuleID = "org.apache.kafka" % "kafka-streams" % Kafka kafkaExclusions
-    //val cassandraDriverCore: ModuleID = "com.datastax.cassandra" % "cassandra-driver-core" % Cassandra cassandraExclusions
-    //val cassandraDriverMapping: ModuleID = "com.datastax.cassandra" % "cassandra-driver-mapping" % Cassandra cassandraExclusions
     val guava: ModuleID = "com.google.guava" % "guava" % Guava
   }
 
@@ -64,7 +62,7 @@ object Dependencies {
     val scalatest: ModuleID = "org.scalatest" %% "scalatest" % ScalaTest % "test"
     val scalactic: ModuleID = "org.scalactic" %% "scalactic" % ScalaTest % "test"
     val supersafe: ModuleID = "com.artima.supersafe" % "supersafe_2.11.8" % SuperSafe % "test"
-    val sparkCassandraEmbedded:ModuleID = "com.datastax.spark" %% "spark-cassandra-connector-embedded" % SparkCassandraEmbedded
+    //val sparkCassandraEmbedded:ModuleID = "com.datastax.spark" %% "spark-cassandra-connector-embedded" % SparkCassandraEmbedded
     val log4j: ModuleID = "log4j" % "log4j" % Log4j % "test"
   }
 
@@ -86,7 +84,7 @@ object Dependencies {
 
   val akka = Seq(akkaActor, akkaAgent, akkaCluster, akkaClusterMetrics, akkaSlf4j, akkaStream, akkaHttp, akkaHttpCore, akkaHttpJson)
 
-  val test = Seq(Test.akkaTestKit, Test.scalatest, Test.scalactic, Test.supersafe, Test.log4j, Test.sparkCassandraEmbedded)
+  val test = Seq(Test.akkaTestKit, Test.scalatest, Test.scalactic, Test.supersafe, Test.log4j)
 
   // Module dependencies
   val core = time ++ config ++ logging ++ akka ++ utils

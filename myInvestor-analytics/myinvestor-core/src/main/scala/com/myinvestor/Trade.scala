@@ -60,6 +60,10 @@ object Trade {
     implicit val stockInfoFormat = jsonFormat17(StockInfo)
   }
 
+  object JsonApiSupport extends JsonApiProtocol {
+
+  }
+
 
   trait TradeAggregate extends TradeModel with Serializable {
     def symbol: String

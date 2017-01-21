@@ -2,15 +2,17 @@ package com.myinvestor.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.datastax.spark.connector.streaming._
+import com.myinvestor.AppSettings
+import com.myinvestor.Trade.JsonApiSupport._
 import com.myinvestor.TradeEvent.OutputStreamInitialized
 import com.myinvestor.TradeSchema._
-import com.myinvestor.AppSettings
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010._
+import spray.json._
 
 /**
   * The KafkaStreamActor creates a streaming pipeline from Kafka to Cassandra via Spark.
@@ -29,7 +31,7 @@ class ExchangeActor(kafkaParams: Map[String, Object],
   val kafkaStream: InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
 
   // For debugging
-  kafkaStream.map(record => record.value.toString).print
+  kafkaStream.map(_.value.parseJson).map(_.convertTo[Exchange]).saveToCassandra(Keyspace, ExchangeTable)
 
   // Convert the JSON string back to an object
   //kafkaStream.map {
