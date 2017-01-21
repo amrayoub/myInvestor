@@ -1,4 +1,4 @@
-package com.myinvestor
+package com.myinvestor.actor
 
 import java.util.concurrent.TimeoutException
 

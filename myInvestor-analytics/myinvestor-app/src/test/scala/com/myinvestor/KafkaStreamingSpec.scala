@@ -1,8 +1,26 @@
 package com.myinvestor
 
+import org.apache.spark.SparkContext
+import org.scalatest.BeforeAndAfter
+
 /**
-  * Created by MEKOH on 1/20/2017.
+  * Test suite for Kafka.
   */
-class KafkaStreamingSpec {
+class KafkaStreamingSpec extends UnitTestSpec with BeforeAndAfter {
+
+  var sparkContext: SparkContext = _
+
+  before {
+    sparkContext = SparkContextUtils.sp
+  }
+
+  after {
+  }
+
+  "A valid exchange JSON" should "be converted correctly to a correct Exchange object" in {
+
+
+  }
 
 }
+

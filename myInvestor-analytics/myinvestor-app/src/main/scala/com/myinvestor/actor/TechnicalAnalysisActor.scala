@@ -1,6 +1,7 @@
-package com.myinvestor
+package com.myinvestor.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
+import com.myinvestor.AppSettings
 import com.myinvestor.Trade.{MovingAverage10, MovingAverage20}
 import org.apache.spark.SparkContext
 

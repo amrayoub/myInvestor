@@ -8,21 +8,21 @@ object Dependencies {
   import Versions._
 
   implicit class Exclude(module: ModuleID) {
-    def log4jExclude: ModuleID =
-      module excludeAll (ExclusionRule("log4j"))
+    // def log4jExclude: ModuleID =
+    //   module excludeAll (ExclusionRule("none"))   // Default to log4j. Removed for now.
 
     def sparkExclusions: ModuleID =
-      module.log4jExclude
+      module
         .exclude("com.google.guava", "guava")
         .exclude("org.slf4j", "slf4j-log4j12")
 
     def cassandraExclusions: ModuleID =
-      module.log4jExclude
+      module
         .exclude("com.google.guava", "guava")
         .excludeAll(ExclusionRule("org.slf4j"))
 
     def kafkaExclusions: ModuleID =
-      module.log4jExclude
+      module
         .excludeAll(ExclusionRule("org.slf4j"))
         .exclude("com.sun.jmx", "jmxri")
         .exclude("com.sun.jdmk", "jmxtools")
@@ -64,6 +64,7 @@ object Dependencies {
     val scalatest: ModuleID = "org.scalatest" %% "scalatest" % ScalaTest % "test"
     val scalactic: ModuleID = "org.scalactic" %% "scalactic" % ScalaTest % "test"
     val supersafe: ModuleID = "com.artima.supersafe" % "supersafe_2.11.8" % SuperSafe % "test"
+    val sparkCassandraEmbedded:ModuleID = "com.datastax.spark" %% "spark-cassandra-connector-embedded" % SparkCassandraEmbedded
     val log4j: ModuleID = "log4j" % "log4j" % Log4j % "test"
   }
 
@@ -85,7 +86,7 @@ object Dependencies {
 
   val akka = Seq(akkaActor, akkaAgent, akkaCluster, akkaClusterMetrics, akkaSlf4j, akkaStream, akkaHttp, akkaHttpCore, akkaHttpJson)
 
-  val test = Seq(Test.akkaTestKit, Test.scalatest, Test.scalactic, Test.supersafe, Test.log4j)
+  val test = Seq(Test.akkaTestKit, Test.scalatest, Test.scalactic, Test.supersafe, Test.log4j, Test.sparkCassandraEmbedded)
 
   // Module dependencies
   val core = time ++ config ++ logging ++ akka ++ utils

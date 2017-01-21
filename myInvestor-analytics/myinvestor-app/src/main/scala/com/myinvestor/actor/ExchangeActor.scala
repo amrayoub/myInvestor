@@ -1,15 +1,16 @@
-package com.myinvestor
+package com.myinvestor.actor
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
+import com.datastax.spark.connector.streaming._
 import com.myinvestor.TradeEvent.OutputStreamInitialized
+import com.myinvestor.TradeSchema._
+import com.myinvestor.AppSettings
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010._
-import com.datastax.spark.connector.streaming._
-import com.myinvestor.TradeSchema._
 
 /**
   * The KafkaStreamActor creates a streaming pipeline from Kafka to Cassandra via Spark.
@@ -17,24 +18,23 @@ import com.myinvestor.TradeSchema._
   * a column entry for a specific stock trading, and saves the new data
   * to the cassandra table as it arrives.
   */
-class KafkaStreamingActor(kafkaParams: Map[String, Object],
-                          ssc: StreamingContext,
-                          settings: AppSettings,
-                          listener: ActorRef) extends AggregationActor with ActorLogging {
+class ExchangeActor(kafkaParams: Map[String, Object],
+                    ssc: StreamingContext,
+                    settings: AppSettings,
+                    listener: ActorRef) extends AggregationActor with ActorLogging {
 
   import settings._
 
-  // TODO
   val topics = Array(KafkaTopicExchange)
   val kafkaStream: InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
 
   // For debugging
-  //kafkaStream.map(record => record.value.toString).print
+  kafkaStream.map(record => record.value.toString).print
 
   // Convert the JSON string back to an object
-  kafkaStream.map {
-    value =>
-  }.saveToCassandra(Keyspace, ExchangeTable)
+  //kafkaStream.map {
+  //  value =>
+  //}.saveToCassandra(Keyspace, ExchangeTable)
 
   // Notifies the supervisor that the Spark Streams have been created and defined.
   // Now the [[StreamingContext]] can be started.

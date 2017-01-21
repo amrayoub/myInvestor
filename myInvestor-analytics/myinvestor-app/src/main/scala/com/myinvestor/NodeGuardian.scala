@@ -1,6 +1,7 @@
 package com.myinvestor
 
 import akka.actor.{Actor, ActorContext, ActorRef, Props}
+import com.myinvestor.actor.{AggregationActor, ExchangeActor, StockAggregatorActor, TechnicalAnalysisActor}
 import com.myinvestor.cluster.ClusterAwareNodeGuardian
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
@@ -11,7 +12,7 @@ import org.apache.spark.streaming.kafka010.DirectKafkaInputDStream
   * implementer here, but the cluster work, node lifecycle and supervision events
   * are handled in [[ClusterAwareNodeGuardian]], in 'myinvestor/myinvestor-core.
   *
-  * This 'NodeGuardian' creates the [[KafkaStreamingActor]] which creates a streaming
+  * This 'NodeGuardian' creates the [[ExchangeActor]] which creates a streaming
   * pipeline from Kafka to Cassandra, via Spark, which streams and transform the source data from Kafka,
   * and saves the new data to the cassandra data table on arrival.
   */
@@ -23,7 +24,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
   val KafkaActorName = "kafka-stream"
 
   // Creates the Kafka stream saving data and aggregated data to cassandra.
-  context.actorOf(Props(new KafkaStreamingActor(kafkaParams, ssc, settings, self)), KafkaActorName)
+  context.actorOf(Props(new ExchangeActor(kafkaParams, ssc, settings, self)), KafkaActorName)
 
   // The Spark Cassandra computation actor
   val stockAggregator: ActorRef = context.actorOf(Props(new StockAggregatorActor(ssc, settings)), "stock-aggregator")
@@ -35,7 +36,7 @@ class NodeGuardian(ssc: StreamingContext, kafkaParams: Map[String, Object], sett
   }
 
   /** When [[OutputStreamInitialized]] is received in the parent actor, [[ClusterAwareNodeGuardian]],
-    * from the [[KafkaStreamingActor]] after it creates and defines the [[DirectKafkaInputDStream]],
+    * from the [[ExchangeActor]] after it creates and defines the [[DirectKafkaInputDStream]],
     * the Spark Streaming checkpoint can be set, the [[StreamingContext]] can be started, and the
     * node guardian actor moves from [[uninitialized]] to [[initialized]]with [[ActorContext.become()]].
     *

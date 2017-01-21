@@ -5,8 +5,10 @@ import java.util.Properties
 import akka.actor.{Actor, ActorLogging}
 import akka.event.slf4j.Logger
 import com.esotericsoftware.kryo.serializers.DefaultSerializers.StringSerializer
+import com.myinvestor.TradeSchema.Request
 import kafka.server.KafkaConfig
 import org.apache.kafka.clients.producer._
+import com.myinvestor.Trade._
 
 /**
   * Simple producer for an Akka Actor using string encoder and default partitioner.
@@ -57,11 +59,13 @@ class KafkaDataProducer[K, V](config: Properties) {
           log.error("Unable to send record [" + message + "]", exception)
 
           // Update request in Cassandra
+          val request = Request(UUIDFromString(identifier), false, exception.getMessage)
+          SparkContextUtils.saveRequest(request)
 
         } else {
           // Request is successful
-
-
+          val request = Request(UUIDFromString(identifier), true, "")
+          SparkContextUtils.saveRequest(request)
         }
       }
     }

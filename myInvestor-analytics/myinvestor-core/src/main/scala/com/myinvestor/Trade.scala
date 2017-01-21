@@ -26,7 +26,7 @@ object Trade {
     * @param uuid UUID string
     * @return An UUID
     */
-  def UUIDfromString(uuid: String): UUID = java.util.UUID.fromString(uuid)
+  def UUIDFromString(uuid: String): UUID = java.util.UUID.fromString(uuid)
 
   trait JsonApiProtocol extends SprayJsonSupport with DefaultJsonProtocol {
 

@@ -33,6 +33,7 @@ object Versions {
   val SuperSafe = "1.1.0"
   val Guava = "19.0"
   val Log4j = "1.2.17"
+  val SparkCassandraEmbedded = "2.0.0-M3"
 
   // Plugins
 
