@@ -8,7 +8,8 @@ import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010._
-
+import com.datastax.spark.connector.streaming._
+import com.myinvestor.TradeSchema._
 
 /**
   * The KafkaStreamActor creates a streaming pipeline from Kafka to Cassandra via Spark.
@@ -28,7 +29,12 @@ class KafkaStreamingActor(kafkaParams: Map[String, Object],
   val kafkaStream: InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
 
   // For debugging
-  kafkaStream.map(record => record.value.toString).print
+  //kafkaStream.map(record => record.value.toString).print
+
+  // Convert the JSON string back to an object
+  kafkaStream.map {
+    value =>
+  }.saveToCassandra(Keyspace, ExchangeTable)
 
   // Notifies the supervisor that the Spark Streams have been created and defined.
   // Now the [[StreamingContext]] can be started.
